@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Recovery Window — Naté Hailu</title>
+<meta name="description" content="An analysis of 2,431,756 flights, built around a metric the published data does not contain: how many ways out of a disruption a passenger actually has left.">
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #fbfbfc; --bg-2: #f2f2f4; --ink: #131315; --ink-2: #56565c;
+    --muted: #86868b; --hair: #e0e0e3; --link: #1a5fb4;
+    --opt: #2a78d6; --opt-wash: rgba(42,120,214,0.10);
+    --str: #c2551f; --str-wash: rgba(194,85,31,0.10);
+    --axis: #c3c2b7; --grid: #e4e4e7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0a0a0b; --bg-2: #161618; --ink: #f5f5f7; --ink-2: #b4b4ba;
+      --muted: #86868b; --hair: #2a2a2d; --link: #6ba4e8;
+      --opt: #3987e5; --opt-wash: rgba(57,135,229,0.15);
+      --str: #dd8a56; --str-wash: rgba(221,138,86,0.15);
+      --axis: #3a3a3d; --grid: #232326;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0a0a0b; --bg-2: #161618; --ink: #f5f5f7; --ink-2: #b4b4ba;
+    --muted: #86868b; --hair: #2a2a2d; --link: #6ba4e8;
+    --opt: #3987e5; --opt-wash: rgba(57,135,229,0.15);
+    --str: #dd8a56; --str-wash: rgba(221,138,86,0.15);
+    --axis: #3a3a3d; --grid: #232326;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: system-ui, -apple-system, "SF Pro Text", "Segoe UI", sans-serif;
+    font-size: 19px; line-height: 1.6;
+  }
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; border-radius: 2px; }
+
+  .shell { max-width: 780px; margin-inline: auto; padding-inline: 24px; }
+  .wide { max-width: 1000px; margin-inline: auto; padding-inline: 24px; }
+
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--hair);
+  }
+  nav .wide {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 52px; font-size: 15px;
+  }
+  nav .who { font-weight: 600; letter-spacing: -0.01em; color: var(--ink); }
+  nav .who:hover { text-decoration: none; }
+  nav .back { color: var(--ink-2); }
+
+  header.hero { padding-block: clamp(64px, 10vw, 120px) 0; }
+  .kicker {
+    font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 18px;
+  }
+  h1 {
+    font-size: clamp(42px, 7vw, 76px); line-height: 1.05; letter-spacing: -0.035em;
+    font-weight: 700; margin: 0 0 24px; text-wrap: balance;
+  }
+  .standfirst {
+    font-size: clamp(20px, 2.4vw, 25px); line-height: 1.45; letter-spacing: -0.012em;
+    color: var(--ink-2); margin: 0; text-wrap: balance;
+  }
+
+  .facts {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 26px 30px;
+    margin-top: 52px; padding-top: 34px; border-top: 1px solid var(--hair);
+  }
+  @media (min-width: 720px) { .facts { grid-template-columns: repeat(4, 1fr); } }
+  .facts dt {
+    font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px;
+  }
+  .facts dd { margin: 0; font-size: 16px; line-height: 1.45; color: var(--ink); }
+
+  section { padding-block: clamp(56px, 8vw, 92px); }
+  h2 {
+    font-size: clamp(29px, 4.2vw, 42px); line-height: 1.12; letter-spacing: -0.028em;
+    font-weight: 700; margin: 0 0 22px; text-wrap: balance;
+  }
+  h3 {
+    font-size: clamp(20px, 2.4vw, 25px); line-height: 1.25; letter-spacing: -0.018em;
+    font-weight: 600; margin: 42px 0 12px;
+  }
+  p { margin: 0 0 20px; }
+  p.big {
+    font-size: clamp(22px, 2.8vw, 30px); line-height: 1.35; letter-spacing: -0.02em;
+    font-weight: 600; margin: 34px 0; text-wrap: balance;
+  }
+  ul.plain { margin: 0 0 20px; padding-left: 22px; }
+  ul.plain li { margin-bottom: 10px; }
+  strong { font-weight: 600; }
+
+  .pull {
+    margin: 44px 0; padding: 26px 28px; background: var(--bg-2); border-radius: 14px;
+  }
+  .pull p { margin: 0 0 14px; }
+  .pull p:last-child { margin: 0; }
+  .pull .lbl {
+    font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 10px;
+  }
+
+  figure { margin: 48px 0; }
+  figcaption { font-size: 15px; color: var(--muted); margin-top: 16px; line-height: 1.5; }
+  .chart { background: var(--bg-2); border-radius: 14px; padding: 26px 20px 16px; }
+  .chart h4 {
+    font-size: 17px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 3px;
+    padding-inline: 6px;
+  }
+  .chart .unit { font-size: 14px; color: var(--muted); margin: 0 0 8px; padding-inline: 6px; }
+  svg { display: block; width: 100%; height: auto; }
+  .tick { font-size: 10.5px; fill: var(--muted); font-variant-numeric: tabular-nums;
+          font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .endlbl { font-size: 12.5px; font-weight: 600; fill: var(--ink); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 16px; margin: 6px 0 20px; }
+  th, td { text-align: right; padding: 11px 10px 11px 0; border-bottom: 1px solid var(--hair); }
+  th:first-child, td:first-child { text-align: left; }
+  thead th {
+    font-size: 12px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  tbody td { font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  tbody td:first-child { color: var(--ink); font-weight: 500; }
+  .tscroll { overflow-x: auto; }
+  @media (max-width: 620px) { table { min-width: 460px; } }
+
+  footer { padding-block: 56px 72px; border-top: 1px solid var(--hair); color: var(--muted); font-size: 15px; }
+  footer p { margin: 0 0 10px; max-width: 62ch; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wide">
+    <a class="who" href="index.html">Naté Hailu</a>
+    <a class="back" href="index.html">&lsaquo; All work</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="shell">
+    <p class="kicker">Case study · Operations analysis</p>
+    <h1>Disruptions don't get worse at night. Recovery does.</h1>
+    <p class="standfirst">
+      2,431,756 flights, twelve months, and one metric that the published on-time data
+      does not contain: how many ways out of a disruption a passenger actually has left.
+    </p>
+    <dl class="facts">
+      <div><dt>Role</dt><dd>Sole analyst</dd></div>
+      <div><dt>Timeline</dt><dd>September 2026</dd></div>
+      <div><dt>Data</dt><dd>BTS On-Time Performance, Jun 2025 – May 2026</dd></div>
+      <div><dt>Tools</dt><dd>Python, pandas, Power BI</dd></div>
+    </dl>
+  </div>
+</header>
+
+<section>
+  <div class="shell">
+    <h2>The question came from the counter, not the data</h2>
+    <p>
+      I work airline operations. When a flight cancels, I am one of the people a hundred
+      passengers walk toward. After enough of those nights, a pattern became obvious that
+      I could not find anywhere in the published statistics.
+    </p>
+    <p>
+      A cancellation at nine in the morning is an inconvenience. The same cancellation at
+      nine at night is a hotel voucher, a missed wedding, a passenger who will not make
+      their connection tomorrow either. Same aircraft, same reason, same row in a
+      database. Completely different night for the person in front of me.
+    </p>
+    <p>
+      Every published measure of airline reliability treats those two events identically.
+      On-time rate, cancellation rate, average delay minutes, none of them can tell the
+      difference. So I went looking for a measure that could.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="shell">
+    <h2>The data</h2>
+    <p>
+      The Bureau of Transportation Statistics publishes a row for every domestic flight
+      operated by a reporting carrier: schedule, actual times, delay minutes attributed to
+      five causes, cancellations, diversions, and the tail number of the aircraft.
+    </p>
+    <p>
+      I pulled twelve months, June 2025 through May 2026, and scoped it to flights
+      touching a United hub or Lubbock, which is where I work. Every carrier was kept
+      rather than filtering to one, because a single airline's numbers mean nothing
+      without the industry beside them.
+    </p>
+
+    <h3>Pipeline</h3>
+    <ul class="plain">
+      <li>Twelve monthly archives downloaded and unpacked, roughly 30MB compressed each.</li>
+      <li>Cut from 100+ columns to the 33 the question needs, which took the working set from gigabytes to something that fits in memory.</li>
+      <li>Scoped by origin or destination to eight airports, retaining 2,431,756 of 7,047,314 flights.</li>
+      <li>Derived fields computed per row, then the whole set combined for the analysis.</li>
+      <li>Resumable and reproducible end to end. Re-running it produces the same file.</li>
+    </ul>
+
+    <div class="pull">
+      <p class="lbl">A deliberate choice</p>
+      <p>
+        I defined <strong>disrupted</strong> as cancelled, diverted, or arriving 45 or
+        more minutes late, rather than using the industry's 15-minute on-time standard.
+      </p>
+      <p>
+        Fifteen minutes measures whether a flight was late. Forty-five measures whether a
+        connection broke. This study is about what happens to the passenger afterward, so
+        the threshold had to match the consequence rather than the convention.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shell">
+    <h2>The metric</h2>
+    <p>
+      For every flight in the dataset, I counted the later departures that day on the same
+      route, on any carrier, leaving at least sixty minutes after the original. Sixty
+      because a passenger has to be told, reissued, and physically get to another gate.
+    </p>
+    <p class="big">
+      If a disrupted flight had zero of those, the passenger was not rebooked that day.
+      They were stranded.
+    </p>
+    <p>
+      That number is the thing the published statistics cannot see. It is not a measure of
+      how often airlines fail. It is a measure of how much room is left to recover when
+      they do, and it turns out to behave completely differently.
+    </p>
+    <p>
+      Computing it across 2.4 million rows naively would have taken hours. Sorting every
+      day-and-route group into one global array and using a single binary search brought
+      it to ten seconds. I verified the fast version against a slow, obviously correct
+      implementation, row for row, before trusting any of the numbers below.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wide">
+    <div class="shell" style="padding-inline:0">
+      <h2>What the data showed</h2>
+      <p>
+        Disruption risk roughly triples between dawn and dusk. That part was expected.
+        What was not expected is how much faster the ways out disappear.
+      </p>
+    </div>
+
+    <figure>
+      <div class="chart">
+        <h4>Ways out</h4>
+        <p class="unit">Average later flights on the same route, same day</p>
+        <svg id="svgA" viewBox="0 0 900 230" role="img"
+             aria-label="Average same-route flights still available by scheduled departure hour, falling from 8.5 at 5am to zero at 11pm."></svg>
+      </div>
+      <div class="chart" style="margin-top:14px">
+        <h4>No way out</h4>
+        <p class="unit">Share of disrupted flights with no same-day option</p>
+        <svg id="svgB" viewBox="0 0 900 252" role="img"
+             aria-label="Share of disrupted flights with no same-day same-route option, rising from 4.5 percent at 5am to 100 percent at 11pm."></svg>
+      </div>
+      <figcaption>
+        Hours 00:00 to 04:00 are omitted from the charts. Fewer than 7,000 departures
+        across the year, too thin to read.
+      </figcaption>
+    </figure>
+
+    <div class="shell" style="padding-inline:0">
+      <p class="big">
+        A passenger disrupted in the evening is stranded 6.7 times more often than one
+        disrupted in the morning. 58.2 percent against 8.7 percent.
+      </p>
+      <p>
+        The mechanism is in the first chart. Average remaining options fall from 8.5 in
+        the early morning to 0.36 by eight at night and to zero by eleven. Disruption
+        risk triples across the day. Recovery capacity falls by ninety-five percent.
+      </p>
+      <p>
+        Which means the outcome is effectively decided at the moment the flight is
+        cancelled. Everything after that is the passenger finding out slowly, in a line.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shell">
+    <h2>Three findings I did not go looking for</h2>
+
+    <h3>Regional carriers strand at twice the mainline rate</h3>
+    <p>
+      SkyWest 6.10 percent, Republic 6.22, Envoy 6.17, PSA 8.79, against United 3.12,
+      Delta 2.35, Alaska 2.02. The striking part is that this does not track reliability.
+      American disrupts <em>more</em> often than SkyWest, 16.8 percent against 15.1, and
+      strands <em>less</em>, 4.07 against 6.10.
+    </p>
+    <p>
+      Frequency drives recovery, not reliability. A route with twelve daily departures
+      absorbs a failure. A route with two does not. That makes it a network design finding
+      rather than an operational one.
+    </p>
+
+    <h3>Weather is the worst cause, for an unobvious reason</h3>
+    <div class="tscroll">
+      <table>
+        <thead>
+          <tr><th scope="col">Primary cause</th><th scope="col">Flights</th><th scope="col">Avg delay</th><th scope="col">Strand rate</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Weather</td><td>21,767</td><td>129 min</td><td>24.5%</td></tr>
+          <tr><td>Late aircraft</td><td>194,285</td><td>86 min</td><td>19.7%</td></tr>
+          <tr><td>Carrier</td><td>168,968</td><td>77 min</td><td>11.9%</td></tr>
+          <tr><td>National Air System</td><td>179,379</td><td>57 min</td><td>10.8%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      Weather is the rarest primary cause in the set and by far the most damaging. It
+      produces delays half again as long as anything else and strands more than twice as
+      often as air traffic constraints. Weather disruptions are longer, and long
+      disruptions push into the part of the day where nothing is left.
+    </p>
+
+    <h3>My own station is in the ten worst</h3>
+    <p>
+      Lubbock strands 6.09 percent of its flights, putting it among the ten worst airports
+      in the dataset above five thousand annual departures. A small station with few daily
+      departures has almost no slack, which is the same finding as the regional carriers,
+      seen from the ground instead of the fleet.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="shell">
+    <h2>What this does not measure</h2>
+    <p>
+      Options are counted on the same origin and destination pair only. Real
+      reaccommodation can route a passenger through a different connection, onto a partner
+      carrier, or to a nearby airport with ground transport.
+    </p>
+    <p>
+      So this is a <strong>floor on available recovery, not literal stranding.</strong>
+      The true figure is lower than 31.6 percent, and it is lower by more at the big
+      multi-airport hubs than at places like Lubbock.
+    </p>
+    <p>
+      I state it this way because a reviewer who works in the industry will see the gap in
+      about ten seconds, and a number presented without its limits is worth less than a
+      smaller number presented with them. Closing that gap by layering in connecting
+      itineraries is the obvious second version of this analysis.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="shell">
+    <h2>What I would do with it</h2>
+    <p>
+      The finding points somewhere specific. If the outcome is already decided when the
+      cancellation is entered, then speed at the counter is the wrong lever. Nobody should
+      be standing at that counter in the first place.
+    </p>
+    <ul class="plain">
+      <li>
+        <strong>Reaccommodate before the announcement.</strong> The system knows the
+        passenger list, the remaining capacity, and, with this metric, whether any
+        capacity exists at all. Assign and push before a queue can form.
+      </li>
+      <li>
+        <strong>Use the metric as a trigger, not a report.</strong> Zero remaining options
+        is a condition a system can detect in advance and act on, not a statistic to
+        review next quarter.
+      </li>
+      <li>
+        <strong>Reposition aircraft against the rotation, not against the schedule.</strong>
+        Where a recovery flight is worth running, use the aircraft whose next assignment
+        already begins at that station, so the repositioning was going to happen anyway.
+      </li>
+    </ul>
+    <p>
+      Each of these has real operational objections, and I worked through them separately
+      rather than presenting the recommendations unchallenged. The constraint I held
+      throughout: nothing that asks an airline to spend money against its own interest.
+      Every recommendation above reduces agent hours, reroute fees, or both.
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="shell">
+    <h2>What I took from it</h2>
+    <p>
+      The most useful thing I brought to this was not a technique. It was knowing which
+      question to ask. The 45-minute threshold, the 60-minute rebooking buffer, and the
+      entire idea of counting remaining options came from standing at a service desk, not
+      from the dataset.
+    </p>
+    <p>
+      The second thing was learning to say what a number does not cover. The honest
+      version of this analysis is less impressive than the version I could have written,
+      and considerably more defensible.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <div class="shell">
+    <p>
+      Independent analysis of public Bureau of Transportation Statistics data. Not
+      affiliated with, endorsed by, or using internal data from any airline. No passenger
+      information of any kind was used or accessed.
+    </p>
+    <p><a href="index.html">&lsaquo; Back to all work</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var DATA = [
+    { h:5,  n:55588,  dis:0.058268, opt:8.488, str:0.045380 },
+    { h:6,  n:157114, dis:0.065239, opt:8.108, str:0.079608 },
+    { h:7,  n:190595, dis:0.072415, opt:7.678, str:0.074699 },
+    { h:8,  n:176091, dis:0.083457, opt:6.338, str:0.093359 },
+    { h:9,  n:152717, dis:0.091575, opt:5.836, str:0.106971 },
+    { h:10, n:149252, dis:0.105761, opt:5.722, str:0.087361 },
+    { h:11, n:144541, dis:0.112494, opt:5.045, str:0.088930 },
+    { h:12, n:136810, dis:0.122206, opt:4.101, str:0.167721 },
+    { h:13, n:158290, dis:0.131114, opt:3.766, str:0.136836 },
+    { h:14, n:137506, dis:0.154371, opt:3.425, str:0.157062 },
+    { h:15, n:125537, dis:0.166485, opt:2.915, str:0.187082 },
+    { h:16, n:149396, dis:0.178057, opt:2.376, str:0.229354 },
+    { h:17, n:155979, dis:0.198802, opt:1.507, str:0.380213 },
+    { h:18, n:145099, dis:0.200815, opt:1.112, str:0.452573 },
+    { h:19, n:132712, dis:0.202883, opt:0.716, str:0.568091 },
+    { h:20, n:106087, dis:0.195556, opt:0.364, str:0.731656 },
+    { h:21, n:72300,  dis:0.177192, opt:0.317, str:0.829363 },
+    { h:22, n:51575,  dis:0.164964, opt:0.114, str:0.938168 },
+    { h:23, n:26610,  dis:0.096242, opt:0.000, str:1.000000 }
+  ];
+  var W = 900, L = 54, R = 24, NS = "http://www.w3.org/2000/svg";
+  var x = function (h) { return L + (h - 5) / 18 * (W - L - R); };
+  var hh = function (h) { return (h < 10 ? "0" + h : h) + ":00"; };
+
+  function el(n, a, txt) {
+    var e = document.createElementNS(NS, n);
+    for (var k in a) e.setAttribute(k, a[k]);
+    if (txt !== undefined) e.textContent = txt;
+    return e;
+  }
+
+  function panel(svg, o) {
+    var top = 16, H = o.plotH, base = top + H;
+    var y = function (v) { return base - (v / o.yMax) * H; };
+
+    o.ticks.forEach(function (tk) {
+      svg.appendChild(el("line", { x1: L, x2: W - R, y1: y(tk), y2: y(tk),
+        stroke: tk === 0 ? "var(--axis)" : "var(--grid)", "stroke-width": 1 }));
+      svg.appendChild(el("text", { x: L - 10, y: y(tk) + 3.5, "text-anchor": "end",
+        class: "tick" }, o.fmt(tk)));
+    });
+
+    var pts = DATA.map(function (d) { return x(d.h) + "," + y(o.val(d)); });
+    svg.appendChild(el("path", { d: "M" + L + "," + base + " L" + pts.join(" L") +
+      " L" + x(23) + "," + base + " Z", fill: o.wash, stroke: "none" }));
+    svg.appendChild(el("path", { d: "M" + pts.join(" L"), fill: "none", stroke: o.color,
+      "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+
+    DATA.forEach(function (d) {
+      svg.appendChild(el("circle", { cx: x(d.h), cy: y(o.val(d)), r: 3.2, fill: o.color,
+        stroke: "var(--bg-2)", "stroke-width": 2 }));
+    });
+
+    var f = DATA[0], l = DATA[DATA.length - 1];
+    svg.appendChild(el("text", { x: x(f.h) + 12, y: y(o.val(f)) - 10, class: "endlbl" },
+      o.lbl(o.val(f))));
+    svg.appendChild(el("text", { x: x(l.h) - 6, y: y(o.val(l)) + 20, "text-anchor": "end",
+      class: "endlbl" }, o.lbl(o.val(l))));
+
+    if (o.xAxis) {
+      DATA.forEach(function (d) {
+        if (d.h % 3 !== 2) return;
+        svg.appendChild(el("text", { x: x(d.h), y: base + 20, "text-anchor": "middle",
+          class: "tick" }, hh(d.h)));
+      });
+      svg.appendChild(el("text", { x: (L + W - R) / 2, y: base + 40,
+        "text-anchor": "middle", class: "tick" }, "SCHEDULED DEPARTURE HOUR"));
+    }
+  }
+
+  panel(document.getElementById("svgA"), {
+    plotH: 190, yMax: 9, ticks: [0, 3, 6, 9],
+    val: function (d) { return d.opt; },
+    fmt: function (v) { return v; },
+    lbl: function (v) { return v.toFixed(1); },
+    color: "var(--opt)", wash: "var(--opt-wash)", xAxis: false
+  });
+  panel(document.getElementById("svgB"), {
+    plotH: 190, yMax: 1, ticks: [0, 0.25, 0.5, 0.75, 1],
+    val: function (d) { return d.str; },
+    fmt: function (v) { return Math.round(v * 100) + "%"; },
+    lbl: function (v) { return Math.round(v * 100) + "%"; },
+    color: "var(--str)", wash: "var(--str-wash)", xAxis: true
+  });
+})();
+</script>
+
+</body>
+</html>

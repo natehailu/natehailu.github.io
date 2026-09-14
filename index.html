@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Naté Hailu</title>
+<meta name="description" content="Data analyst. Airline operations, healthcare throughput, and the failures I watch happen.">
+<style>
+  :root {
+    color-scheme: light;
+    --bg:        #fbfbfc;
+    --bg-2:      #f2f2f4;
+    --ink:       #131315;
+    --ink-2:     #56565c;
+    --muted:     #86868b;
+    --hair:      #e0e0e3;
+    --link:      #1a5fb4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg:    #0a0a0b;
+      --bg-2:  #161618;
+      --ink:   #f5f5f7;
+      --ink-2: #b4b4ba;
+      --muted: #86868b;
+      --hair:  #2a2a2d;
+      --link:  #6ba4e8;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0a0a0b; --bg-2: #161618; --ink: #f5f5f7;
+    --ink-2: #b4b4ba; --muted: #86868b; --hair: #2a2a2d; --link: #6ba4e8;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "SF Pro Text", "Segoe UI", sans-serif;
+    font-size: 19px;
+    line-height: 1.55;
+  }
+  a { color: var(--link); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  a:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; border-radius: 2px; }
+
+  .shell { max-width: 1000px; margin-inline: auto; padding-inline: 24px; }
+  section { padding-block: clamp(72px, 11vw, 140px); }
+  section + section { border-top: 1px solid var(--hair); }
+
+  nav {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid var(--hair);
+  }
+  nav .shell {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 52px; font-size: 15px;
+  }
+  nav .who { font-weight: 600; letter-spacing: -0.01em; color: var(--ink); }
+  nav .who:hover { text-decoration: none; }
+  nav ul { list-style: none; display: flex; gap: 26px; margin: 0; padding: 0; }
+  nav ul a { color: var(--ink-2); }
+
+  h1 {
+    font-size: clamp(46px, 8.5vw, 88px);
+    line-height: 1.04; letter-spacing: -0.035em; font-weight: 700;
+    margin: 0 0 22px; text-wrap: balance;
+  }
+  .hero p.lede {
+    font-size: clamp(21px, 2.6vw, 27px); line-height: 1.4; letter-spacing: -0.015em;
+    color: var(--ink-2); max-width: 22ch; margin: 0 0 30px; text-wrap: balance;
+  }
+  .hero p.body { max-width: 56ch; color: var(--ink-2); margin: 0 0 34px; }
+  .hero .links { display: flex; flex-wrap: wrap; gap: 8px 26px; font-size: 17px; }
+
+  h2 {
+    font-size: clamp(32px, 5vw, 52px); line-height: 1.08; letter-spacing: -0.03em;
+    font-weight: 700; margin: 0 0 18px; text-wrap: balance;
+  }
+  .kicker {
+    font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 16px;
+  }
+
+  .work { display: block; color: inherit; }
+  .work:hover { text-decoration: none; }
+  .work .stat {
+    font-size: clamp(76px, 15vw, 168px); line-height: 0.9; letter-spacing: -0.05em;
+    font-weight: 700; margin: 0 0 6px;
+  }
+  .work .stat-cap {
+    font-size: clamp(17px, 2.2vw, 22px); color: var(--ink-2); max-width: 30ch;
+    letter-spacing: -0.01em; margin: 0 0 44px;
+  }
+  .work h3 {
+    font-size: clamp(27px, 3.6vw, 40px); line-height: 1.12; letter-spacing: -0.025em;
+    font-weight: 700; margin: 0 0 14px; text-wrap: balance;
+  }
+  .work p { color: var(--ink-2); max-width: 58ch; margin: 0 0 18px; }
+  .more { font-size: 17px; color: var(--link); font-weight: 500; }
+  .work:hover .more { text-decoration: underline; }
+
+  .meta { display: flex; flex-wrap: wrap; gap: 6px 10px; margin: 26px 0 0; }
+  .tag {
+    font-size: 13px; color: var(--ink-2); background: var(--bg-2);
+    padding: 5px 11px; border-radius: 100px; white-space: nowrap;
+  }
+
+  .cols { display: grid; grid-template-columns: 1fr; gap: 34px; margin-top: 8px; }
+  @media (min-width: 760px) { .cols { grid-template-columns: 1fr 1fr; gap: 56px; } }
+  .cols p { color: var(--ink-2); margin: 0 0 16px; max-width: 46ch; }
+  .cols p:last-child { margin-bottom: 0; }
+  .cols h4 {
+    font-size: 15px; font-weight: 600; letter-spacing: -0.005em; margin: 0 0 8px;
+    color: var(--ink);
+  }
+  .rail { list-style: none; margin: 0; padding: 0; }
+  .rail li { padding: 13px 0; border-bottom: 1px solid var(--hair); color: var(--ink-2); font-size: 17px; }
+  .rail li:first-child { padding-top: 0; }
+  .rail li b { color: var(--ink); font-weight: 600; display: block; }
+
+  footer { padding-block: 56px 72px; color: var(--muted); font-size: 15px; }
+  footer .shell { display: flex; flex-wrap: wrap; gap: 10px 28px; justify-content: space-between; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="shell">
+    <a class="who" href="#top">Naté Hailu</a>
+    <ul>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<section class="hero" id="top">
+  <div class="shell">
+    <h1>I analyze the failures I watch happen.</h1>
+    <p class="lede">Operations analyst. Airline disruption, healthcare throughput.</p>
+    <p class="body">
+      I spend my shifts at an airport service desk, where cancelled flights turn into
+      queues of people who need somewhere to sleep. Then I go home and ask why. This
+      site is what comes out of that.
+    </p>
+    <div class="links">
+      <a href="#work">See the work</a>
+      <a href="mailto:nat3official@icloud.com">nat3official@icloud.com</a>
+      <a href="https://www.linkedin.com/in/natnael-hailu-27b967258" rel="noopener">LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<section id="work">
+  <div class="shell">
+    <p class="kicker">Selected work</p>
+    <a class="work" href="rebooking-analysis.html">
+      <p class="stat">6.7&times;</p>
+      <p class="stat-cap">
+        A disruption at 8pm strands a passenger nearly seven times more often than the
+        same disruption at 9am. Not because evenings break more. Because the ways out run out.
+      </p>
+      <h3>The Recovery Window</h3>
+      <p>
+        An analysis of 2,431,756 flights across United's hubs, built around a metric that
+        does not exist in the published data: how many ways out of a disruption a
+        passenger actually has left.
+      </p>
+      <span class="more">Read the case study &rsaquo;</span>
+      <div class="meta">
+        <span class="tag">Python</span>
+        <span class="tag">Power BI</span>
+        <span class="tag">2.4M records</span>
+        <span class="tag">Public BTS data</span>
+        <span class="tag">Operations</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<section id="about">
+  <div class="shell">
+    <p class="kicker">About</p>
+    <h2>Two years of watching systems fail up close.</h2>
+    <div class="cols">
+      <div>
+        <p>
+          I work airline operations at Lubbock, handling passengers whose plans have just
+          come apart. Before that I spent two years at a Level 1 trauma center moving
+          patients through a 500-bed hospital and keeping their records straight in Epic.
+        </p>
+        <p>
+          Both jobs are the same job underneath. Limited capacity, a queue, a
+          prioritization rule, and a recovery process that buckles when volume spikes. I
+          got interested in measuring that rather than just absorbing it.
+        </p>
+        <p>
+          I have a psychology degree with a business minor from Texas Tech, which turns
+          out to be a useful pair of lenses for operational work. One asks why people
+          behave the way they do under stress. The other asks what it costs.
+        </p>
+      </div>
+      <div>
+        <ul class="rail">
+          <li><b>Airline Operations Agent</b>United Airlines, 2026 to present</li>
+          <li><b>Patient Transport &amp; Health Unit Coordinator</b>UMC Health System, 2024 to 2026</li>
+          <li><b>Business Development Representative</b>Brooks / EcoShield, 2022 to 2024</li>
+          <li><b>B.S. Psychology, Business minor</b>Texas Tech University, 2026</li>
+          <li><b>Google Data Analytics Certificate</b>Coursera</li>
+          <li><b>Tools</b>Power BI, SQL, Python, Excel, Tableau, Figma</li>
+          <li><b>Languages</b>English, Amharic</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="shell">
+    <p class="kicker">Contact</p>
+    <h2>Open to analyst roles. Relocating happily.</h2>
+    <div class="cols">
+      <div>
+        <p>
+          Business analyst, data analyst, operations analyst, healthcare analyst. Based in
+          Lubbock, Texas and open anywhere, with Denver, New York and Miami at the top of
+          the list.
+        </p>
+      </div>
+      <div>
+        <ul class="rail">
+          <li><b>Email</b><a href="mailto:nat3official@icloud.com">nat3official@icloud.com</a></li>
+          <li><b>LinkedIn</b><a href="https://www.linkedin.com/in/natnael-hailu-27b967258" rel="noopener">natnael-hailu</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="shell">
+    <span>&copy; 2026 Naté Hailu</span>
+    <span>Independent work. Public data only. Unaffiliated with any airline.</span>
+  </div>
+</footer>
+
+</body>
+</html>
