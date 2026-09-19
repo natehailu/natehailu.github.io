@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Recovery Window — Airline Rebooking Analysis</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page:        #f5f5f7;
+    --surface:     #ffffff;
+    --surface-2:   #fbfbfa;
+    --ink:         #1d1d1f;
+    --ink-2:       #6e6e73;
+    --muted:       #86868b;
+    --hairline:    #d2d2d7;
+    --border:      rgba(0,0,0,0.06);
+    --shadow:      rgba(0,0,0,0.06);
+    --series-1:    #2a78d6;   /* mainline / primary */
+    --series-2:    #eb6834;   /* regional / highlight */
+    --series-1-fill: rgba(42,120,214,0.14);
+    --series-2-fill: rgba(235,104,52,0.16);
+    --grid:        #e4e4e6;
+    --tooltip-bg:  rgba(255,255,255,0.92);
+    --pill-bg:     rgba(0,0,0,0.045);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page:        #000000;
+      --surface:     #1c1c1e;
+      --surface-2:   #17171a;
+      --ink:         #f5f5f7;
+      --ink-2:       #a1a1a6;
+      --muted:       #8e8e93;
+      --hairline:    #3a3a3c;
+      --border:      rgba(255,255,255,0.08);
+      --shadow:      rgba(0,0,0,0.5);
+      --series-1:    #3987e5;
+      --series-2:    #d95926;
+      --series-1-fill: rgba(57,135,229,0.18);
+      --series-2-fill: rgba(217,89,38,0.20);
+      --grid:        #2c2c2e;
+      --tooltip-bg:  rgba(28,28,30,0.92);
+      --pill-bg:     rgba(255,255,255,0.08);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page:        #000000;
+    --surface:     #1c1c1e;
+    --surface-2:   #17171a;
+    --ink:         #f5f5f7;
+    --ink-2:       #a1a1a6;
+    --muted:       #8e8e93;
+    --hairline:    #3a3a3c;
+    --border:      rgba(255,255,255,0.08);
+    --shadow:      rgba(0,0,0,0.5);
+    --series-1:    #3987e5;
+    --series-2:    #d95926;
+    --series-1-fill: rgba(57,135,229,0.18);
+    --series-2-fill: rgba(217,89,38,0.20);
+    --grid:        #2c2c2e;
+    --tooltip-bg:  rgba(28,28,30,0.92);
+    --pill-bg:     rgba(255,255,255,0.08);
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--page);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+      "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+    padding: 0 0 80px;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- top bar ---------- */
+  .topbar {
+    position: sticky; top: 0; z-index: 20;
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    background: color-mix(in srgb, var(--page) 72%, transparent);
+    border-bottom: 1px solid var(--border);
+  }
+  .topbar .inner {
+    max-width: 1080px; margin: 0 auto; padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .topbar .label {
+    font-size: 14px; font-weight: 600; letter-spacing: -0.01em; color: var(--ink);
+  }
+  .theme-toggle {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--pill-bg); border-radius: 100px; padding: 3px; border: none;
+  }
+  .theme-toggle button {
+    appearance: none; border: none; background: transparent; cursor: pointer;
+    font-family: inherit; font-size: 12.5px; font-weight: 600; color: var(--ink-2);
+    padding: 6px 12px; border-radius: 100px; transition: background .2s, color .2s;
+  }
+  .theme-toggle button.active { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px var(--shadow); }
+
+  /* ---------- hero ---------- */
+  .hero { padding: 56px 0 8px; }
+  .eyebrow {
+    font-size: 13px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase;
+    color: var(--series-1); margin: 0 0 10px;
+  }
+  h1 {
+    font-size: clamp(30px, 5vw, 44px); font-weight: 700; letter-spacing: -0.022em;
+    margin: 0 0 14px; color: var(--ink);
+  }
+  .dek { font-size: 18px; color: var(--ink-2); max-width: 60ch; margin: 0 0 40px; }
+
+  /* ---------- kpi row ---------- */
+  .kpis {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+    margin-bottom: 56px;
+  }
+  @media (max-width: 760px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi {
+    background: var(--surface); border-radius: 18px; padding: 20px 20px 18px;
+    border: 1px solid var(--border); box-shadow: 0 1px 2px var(--shadow);
+  }
+  .kpi .num {
+    font-size: clamp(24px, 3.4vw, 32px); font-weight: 700; letter-spacing: -0.02em;
+    font-variant-numeric: proportional-nums; color: var(--ink); margin-bottom: 4px;
+  }
+  .kpi .num small { font-size: 0.55em; font-weight: 600; color: var(--muted); }
+  .kpi .lbl { font-size: 13px; color: var(--ink-2); font-weight: 500; }
+
+  /* ---------- sections ---------- */
+  section.panel {
+    background: var(--surface); border-radius: 20px; border: 1px solid var(--border);
+    box-shadow: 0 1px 2px var(--shadow); padding: 28px 28px 24px; margin-bottom: 24px;
+  }
+  @media (max-width: 620px) { section.panel { padding: 22px 18px 18px; border-radius: 16px; } }
+  .panel h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.015em; margin: 0 0 6px; }
+  .panel .sub { font-size: 14.5px; color: var(--ink-2); margin: 0 0 22px; max-width: 62ch; }
+  .legend { display: flex; gap: 18px; flex-wrap: wrap; margin: -8px 0 18px; font-size: 13px; color: var(--ink-2); }
+  .legend .item { display: flex; align-items: center; gap: 7px; }
+  .legend .swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+
+  svg.chart { width: 100%; height: auto; display: block; overflow: visible; }
+  .axis-label { font-size: 11px; fill: var(--muted); font-family: inherit; }
+  .gridline { stroke: var(--grid); stroke-width: 1; }
+  .baseline { stroke: var(--hairline); stroke-width: 1; }
+
+  .tooltip {
+    position: absolute; pointer-events: none; z-index: 30;
+    background: var(--tooltip-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border); border-radius: 10px; padding: 8px 11px;
+    font-size: 12.5px; color: var(--ink); box-shadow: 0 4px 16px var(--shadow);
+    opacity: 0; transition: opacity .12s; white-space: nowrap;
+  }
+  .tooltip .t-title { font-weight: 700; margin-bottom: 3px; }
+  .tooltip .t-row { color: var(--ink-2); }
+  .tooltip .t-row b { color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  .chart-wrap { position: relative; }
+
+  .data-toggle { margin-top: 16px; }
+  .data-toggle-btn {
+    appearance: none; -webkit-appearance: none; border: none; background: transparent;
+    cursor: pointer; font-family: inherit; font-size: 13px; font-weight: 600;
+    color: var(--series-1); display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 2px; margin: 0; -webkit-tap-highlight-color: transparent;
+  }
+  .data-toggle-btn .arrow { font-size: 10px; transition: transform .15s; display: inline-block; }
+  .data-toggle-btn[aria-expanded="true"] .arrow { transform: rotate(90deg); }
+  .data-table-wrap { display: none; }
+  .data-table-wrap.open { display: block; }
+  table.data-table {
+    width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px;
+  }
+  table.data-table th, table.data-table td {
+    text-align: right; padding: 6px 10px; border-bottom: 1px solid var(--hairline);
+    font-variant-numeric: tabular-nums;
+  }
+  table.data-table th:first-child, table.data-table td:first-child { text-align: left; }
+  table.data-table thead th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+
+  .foot {
+    margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--border);
+    font-size: 13px; color: var(--muted); max-width: 68ch;
+  }
+  .foot p { margin: 0 0 8px; }
+
+  .callout {
+    background: var(--surface-2); border-radius: 12px; padding: 14px 16px;
+    font-size: 14px; color: var(--ink-2); margin-top: 18px; border: 1px solid var(--border);
+  }
+  .callout b { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="inner">
+    <span class="label">Airline Rebooking Flow Efficiency</span>
+    <div class="theme-toggle" role="group" aria-label="Theme">
+      <button data-theme-btn="auto" class="active">Auto</button>
+      <button data-theme-btn="light">Light</button>
+      <button data-theme-btn="dark">Dark</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="hero">
+    <p class="eyebrow">Independent analysis · BTS on-time performance data</p>
+    <h1>The Recovery Window</h1>
+    <p class="dek">
+      2.4 million flights, June 2025 through May 2026, scoped to seven United hubs
+      plus Lubbock. The question underneath all of it: when a flight is disrupted,
+      how many real options does a passenger actually have left, and how fast does
+      that number disappear?
+    </p>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi">
+      <div class="num">2.43<small>M</small></div>
+      <div class="lbl">Flights analyzed</div>
+    </div>
+    <div class="kpi">
+      <div class="num">13.4<small>%</small></div>
+      <div class="lbl">Disruption rate</div>
+    </div>
+    <div class="kpi">
+      <div class="num">31.6<small>%</small></div>
+      <div class="lbl">Of disrupted flights, no same-day recovery</div>
+    </div>
+    <div class="kpi">
+      <div class="num">6.7<small>×</small></div>
+      <div class="lbl">Evening vs. morning stranding penalty</div>
+    </div>
+  </div>
+
+  <section class="panel">
+    <h2>The day runs out of options faster than it runs out of flights</h2>
+    <p class="sub">
+      Scheduled departure hour, 9am to 11pm. Disruption risk roughly triples across
+      the day. The number of later same-route flights a stranded passenger could be
+      moved onto collapses almost to zero well before that.
+    </p>
+    <div class="legend">
+      <div class="item"><span class="swatch" style="background:var(--series-1)"></span>Disruption rate</div>
+      <div class="item"><span class="swatch" style="background:var(--series-2)"></span>Avg. later options remaining</div>
+    </div>
+    <div class="chart-wrap" id="hourChartWrap"></div>
+    <div class="callout">
+      <b>Same event, different hour, different outcome.</b> A disruption at 9am
+      still has 5.8 later flights it could move to. The same disruption at 8pm has
+      0.36. By 11pm, zero.
+    </div>
+    <div class="data-toggle">
+      <button type="button" class="data-toggle-btn" data-target="hourTableWrap" aria-expanded="false">
+        <span class="arrow">▸</span>View hourly data
+      </button>
+      <div class="data-table-wrap" id="hourTableWrap"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Delay cause and stranding risk don't move together evenly</h2>
+    <p class="sub">
+      Weather delays are rarer than carrier or aircraft-rotation delays, but they
+      run longer and strand passengers more often than any other cause.
+    </p>
+    <div class="chart-wrap" id="causeChartWrap"></div>
+    <div class="data-toggle">
+      <button type="button" class="data-toggle-btn" data-target="causeTableWrap" aria-expanded="false">
+        <span class="arrow">▸</span>View cause data
+      </button>
+      <div class="data-table-wrap" id="causeTableWrap"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Regional carriers strand passengers at roughly twice the mainline rate</h2>
+    <p class="sub">
+      Each point is one carrier: how often it disrupts (x-axis) against how often
+      that disruption leaves a passenger with no same-day recovery (y-axis). Point
+      size scales with flight volume.
+    </p>
+    <div class="legend">
+      <div class="item"><span class="swatch" style="background:var(--series-1)"></span>Mainline / low-cost</div>
+      <div class="item"><span class="swatch" style="background:var(--series-2)"></span>Regional / feeder</div>
+    </div>
+    <div class="chart-wrap" id="carrierChartWrap"></div>
+    <div class="callout">
+      <b>Frequency drives recovery more than reliability does.</b> American
+      disrupts more often than SkyWest, 16.8% vs. 15.1%, but strands passengers
+      less, 4.1% vs. 6.1%, because it has more daily frequencies to rebook onto.
+    </div>
+    <div class="data-toggle">
+      <button type="button" class="data-toggle-btn" data-target="carrierTableWrap" aria-expanded="false">
+        <span class="arrow">▸</span>View carrier data
+      </button>
+      <div class="data-table-wrap" id="carrierTableWrap"></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Lubbock isn't an outlier. It's a small station, and small stations strand worst</h2>
+    <p class="sub">
+      Worst-stranding airports with at least 5,000 flights in scope. Thin routes
+      have no slack to absorb a failure, regardless of carrier.
+    </p>
+    <div class="chart-wrap" id="airportChartWrap"></div>
+    <div class="data-toggle">
+      <button type="button" class="data-toggle-btn" data-target="airportTableWrap" aria-expanded="false">
+        <span class="arrow">▸</span>View airport data
+      </button>
+      <div class="data-table-wrap" id="airportTableWrap"></div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <p>
+      Independent analysis of public Bureau of Transportation Statistics on-time
+      performance data, June 2025 through May 2026, scoped to flights touching
+      ORD, DEN, IAH, EWR, SFO, IAD, LAX, or Lubbock. Not affiliated with,
+      endorsed by, or using internal data from any airline.
+    </p>
+    <p>
+      "Recovery" here means a later same-day departure on the same
+      origin-destination pair. It does not account for connecting itineraries,
+      partner-airline rerouting, or ground transport, so it is a floor on real
+      options, not the complete picture.
+    </p>
+  </div>
+
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============================= DATA ============================= */
+  // Curated 9am–11pm window (matches the published findings; overnight hours
+  // carry too little volume to read cleanly on a chart).
+  var hourData = [
+    {h:9,  disruption:0.09157, options:5.836},
+    {h:10, disruption:0.10576, options:5.722},
+    {h:11, disruption:0.11249, options:5.045},
+    {h:12, disruption:0.12221, options:4.101},
+    {h:13, disruption:0.13111, options:3.766},
+    {h:14, disruption:0.15437, options:3.425},
+    {h:15, disruption:0.16648, options:2.915},
+    {h:16, disruption:0.17806, options:2.376},
+    {h:17, disruption:0.19880, options:1.507},
+    {h:18, disruption:0.20081, options:1.112},
+    {h:19, disruption:0.20288, options:0.716},
+    {h:20, disruption:0.19556, options:0.364},
+    {h:21, disruption:0.17719, options:0.317},
+    {h:22, disruption:0.16496, options:0.114},
+    {h:23, disruption:0.09624, options:0.0}
+  ];
+
+  var causeData = [
+    {cause:"Weather",      flights:21767,  avgDelay:129.3, strand:0.2454},
+    {cause:"Late aircraft",flights:194285, avgDelay:86.3,  strand:0.1967},
+    {cause:"Carrier",      flights:168968, avgDelay:76.6,  strand:0.1191},
+    {cause:"NAS",          flights:179379, avgDelay:56.9,  strand:0.1084},
+    {cause:"Security",     flights:658,    avgDelay:53.4,  strand:0.1003}
+  ];
+
+  var carrierData = [
+    {code:"AA", name:"American",  flights:236499, disruption:0.16768, strand:0.04071, regional:false},
+    {code:"AS", name:"Alaska",    flights:58204,  disruption:0.11070, strand:0.02017, regional:false},
+    {code:"B6", name:"JetBlue",   flights:39044,  disruption:0.15452, strand:0.04446, regional:false},
+    {code:"DL", name:"Delta",     flights:174732, disruption:0.11834, strand:0.02354, regional:false},
+    {code:"F9", name:"Frontier",  flights:77694,  disruption:0.15609, strand:0.05150, regional:false},
+    {code:"G4", name:"Allegiant", flights:3913,   disruption:0.13238, strand:0.11015, regional:false},
+    {code:"HA", name:"Hawaiian",  flights:3535,   disruption:0.11683, strand:0.02037, regional:false},
+    {code:"MQ", name:"Envoy",     flights:119953, disruption:0.14345, strand:0.06167, regional:true},
+    {code:"NK", name:"Spirit",    flights:44000,  disruption:0.19720, strand:0.06243, regional:false},
+    {code:"OH", name:"PSA",       flights:10728,  disruption:0.24953, strand:0.08790, regional:true},
+    {code:"OO", name:"SkyWest",   flights:474227, disruption:0.15097, strand:0.06095, regional:true},
+    {code:"UA", name:"United",    flights:810043, disruption:0.11271, strand:0.03120, regional:false},
+    {code:"WN", name:"Southwest", flights:250456, disruption:0.12473, strand:0.03560, regional:false},
+    {code:"YX", name:"Republic",  flights:128728, disruption:0.14087, strand:0.06221, regional:true}
+  ];
+
+  var airportData = [
+    {code:"LBB", name:"Lubbock",   flights:6622,  strand:0.0609, home:true},
+    {code:"ASE", name:"Aspen",     flights:6003,  strand:0.0930, home:false},
+    {code:"CHS", name:"Charleston",flights:5053,  strand:0.0766, home:false},
+    {code:"PBI", name:"West Palm Beach", flights:6048, strand:0.0686, home:false},
+    {code:"MEM", name:"Memphis",   flights:5563,  strand:0.0674, home:false},
+    {code:"BZN", name:"Bozeman",   flights:5420,  strand:0.0637, home:false},
+    {code:"RDU", name:"Raleigh-Durham", flights:11275, strand:0.0614, home:false},
+    {code:"CMH", name:"Columbus",  flights:10938, strand:0.0570, home:false},
+    {code:"ICT", name:"Wichita",   flights:5064,  strand:0.0565, home:false},
+    {code:"PSP", name:"Palm Springs", flights:5975, strand:0.0559, home:false}
+  ].sort(function(a,b){ return b.strand - a.strand; });
+
+  /* ============================= HELPERS ============================= */
+  var cssVar = function (name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  };
+  var fmtPct = function (v, d) { return (v * 100).toFixed(d == null ? 1 : d) + "%"; };
+  var svgns = "http://www.w3.org/2000/svg";
+  function el(tag, attrs) {
+    var e = document.createElementNS(svgns, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  var tooltip = document.getElementById("tooltip");
+  function showTooltip(x, y, html, containerRect) {
+    tooltip.innerHTML = html;
+    tooltip.style.opacity = "1";
+    var tw = tooltip.offsetWidth, th = tooltip.offsetHeight;
+    var left = containerRect.left + window.scrollX + x + 14;
+    var top = containerRect.top + window.scrollY + y - th - 10;
+    if (left + tw > window.scrollX + document.documentElement.clientWidth - 12) {
+      left = containerRect.left + window.scrollX + x - tw - 14;
+    }
+    if (top < window.scrollY + 8) top = containerRect.top + window.scrollY + y + 14;
+    tooltip.style.left = left + "px";
+    tooltip.style.top = top + "px";
+  }
+  function hideTooltip() { tooltip.style.opacity = "0"; }
+
+  /* ============================= HOUR CHART (small multiples, shared x) ===== */
+  function buildHourChart() {
+    var wrap = document.getElementById("hourChartWrap");
+    var W = 760, H1 = 150, H2 = 150, gap = 34, padL = 40, padR = 14, padT = 10, padB = 26;
+    var totalH = padT + H1 + gap + H2 + padB;
+    var svg = el("svg", { class: "chart", viewBox: "0 0 " + W + " " + totalH, role: "img",
+      "aria-label": "Disruption rate and average recovery options by scheduled departure hour, 9am to 11pm" });
+
+    var hMin = 9, hMax = 23;
+    var x = function (h) { return padL + (h - hMin) / (hMax - hMin) * (W - padL - padR); };
+
+    // ---- Panel 1: disruption rate ----
+    var maxD = Math.max.apply(null, hourData.map(function(d){return d.disruption;}));
+    var y1 = function (v) { return padT + H1 - (v / (maxD * 1.08)) * H1; };
+    [0, 0.05, 0.10, 0.15, 0.20].forEach(function (t) {
+      if (t > maxD * 1.08) return;
+      var yy = y1(t);
+      svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: yy, y2: yy, class: "gridline" }));
+      var lbl = el("text", { x: padL - 8, y: yy + 3, class: "axis-label", "text-anchor": "end" });
+      lbl.textContent = Math.round(t * 100) + "%";
+      svg.appendChild(lbl);
+    });
+    var path1 = "M " + hourData.map(function (d) { return x(d.h) + " " + y1(d.disruption); }).join(" L ");
+    var area1 = "M " + x(hMin) + " " + y1(0) + " L " + hourData.map(function (d) { return x(d.h) + " " + y1(d.disruption); }).join(" L ") + " L " + x(hMax) + " " + y1(0) + " Z";
+    svg.appendChild(el("path", { d: area1, fill: "var(--series-1-fill)", stroke: "none" }));
+    svg.appendChild(el("path", { d: path1, fill: "none", stroke: "var(--series-1)", "stroke-width": 2.5, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+    var p1Label = el("text", { x: padL, y: padT - 2, class: "axis-label", "font-weight": 600 });
+    p1Label.textContent = "DISRUPTION RATE";
+    svg.appendChild(p1Label);
+
+    // ---- Panel 2: avg options remaining ----
+    var y2base = padT + H1 + gap;
+    var maxO = Math.max.apply(null, hourData.map(function(d){return d.options;}));
+    var y2 = function (v) { return y2base + H2 - (v / (maxO * 1.08)) * H2; };
+    [0, 2, 4, 6].forEach(function (t) {
+      if (t > maxO * 1.08) return;
+      var yy = y2(t);
+      svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: yy, y2: yy, class: "gridline" }));
+      var lbl = el("text", { x: padL - 8, y: yy + 3, class: "axis-label", "text-anchor": "end" });
+      lbl.textContent = t;
+      svg.appendChild(lbl);
+    });
+    var path2 = "M " + hourData.map(function (d) { return x(d.h) + " " + y2(d.options); }).join(" L ");
+    var area2 = "M " + x(hMin) + " " + y2(0) + " L " + hourData.map(function (d) { return x(d.h) + " " + y2(d.options); }).join(" L ") + " L " + x(hMax) + " " + y2(0) + " Z";
+    svg.appendChild(el("path", { d: area2, fill: "var(--series-2-fill)", stroke: "none" }));
+    svg.appendChild(el("path", { d: path2, fill: "none", stroke: "var(--series-2)", "stroke-width": 2.5, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+    var p2Label = el("text", { x: padL, y: y2base - 2, class: "axis-label", "font-weight": 600 });
+    p2Label.textContent = "AVG. OPTIONS REMAINING";
+    svg.appendChild(p2Label);
+
+    // ---- shared x axis ----
+    [9, 12, 15, 18, 21, 23].forEach(function (h) {
+      var lbl = el("text", { x: x(h), y: totalH - 6, class: "axis-label", "text-anchor": "middle" });
+      lbl.textContent = (h % 12 === 0 ? 12 : h % 12) + (h < 12 ? "am" : "pm");
+      svg.appendChild(lbl);
+    });
+    svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: y2base + H2, y2: y2base + H2, class: "baseline" }));
+
+    // ---- crosshair + hover dots ----
+    var cross = el("line", { x1: 0, x2: 0, y1: padT, y2: y2base + H2, stroke: "var(--hairline)", "stroke-width": 1, opacity: 0 });
+    svg.appendChild(cross);
+    var dot1 = el("circle", { r: 4, fill: "var(--series-1)", stroke: "var(--surface)", "stroke-width": 2, opacity: 0 });
+    var dot2 = el("circle", { r: 4, fill: "var(--series-2)", stroke: "var(--surface)", "stroke-width": 2, opacity: 0 });
+    svg.appendChild(dot1); svg.appendChild(dot2);
+
+    var hitArea = el("rect", { x: padL, y: padT, width: W - padL - padR, height: y2base + H2 - padT, fill: "transparent" });
+    svg.appendChild(hitArea);
+
+    function nearestHour(px) {
+      var best = hourData[0], bestDist = Infinity;
+      hourData.forEach(function (d) {
+        var dist = Math.abs(x(d.h) - px);
+        if (dist < bestDist) { bestDist = dist; best = d; }
+      });
+      return best;
+    }
+
+    hitArea.addEventListener("mousemove", function (evt) {
+      var rect = svg.getBoundingClientRect();
+      var scale = W / rect.width;
+      var px = (evt.clientX - rect.left) * scale;
+      var d = nearestHour(px);
+      var xx = x(d.h);
+      cross.setAttribute("x1", xx); cross.setAttribute("x2", xx); cross.setAttribute("opacity", 1);
+      dot1.setAttribute("cx", xx); dot1.setAttribute("cy", y1(d.disruption)); dot1.setAttribute("opacity", 1);
+      dot2.setAttribute("cx", xx); dot2.setAttribute("cy", y2(d.options)); dot2.setAttribute("opacity", 1);
+      var hourLabel = (d.h % 12 === 0 ? 12 : d.h % 12) + (d.h < 12 ? "am" : "pm");
+      showTooltip(xx / scale, y1(d.disruption) / scale,
+        "<div class='t-title'>" + hourLabel + "</div>" +
+        "<div class='t-row'>Disruption rate <b>" + fmtPct(d.disruption) + "</b></div>" +
+        "<div class='t-row'>Avg. options remaining <b>" + d.options.toFixed(2) + "</b></div>",
+        rect);
+    });
+    hitArea.addEventListener("mouseleave", function () {
+      cross.setAttribute("opacity", 0); dot1.setAttribute("opacity", 0); dot2.setAttribute("opacity", 0);
+      hideTooltip();
+    });
+
+    wrap.innerHTML = "";
+    wrap.appendChild(svg);
+
+    // data table
+    var tblWrap = document.getElementById("hourTableWrap");
+    var rows = hourData.map(function (d) {
+      var hourLabel = (d.h % 12 === 0 ? 12 : d.h % 12) + (d.h < 12 ? "am" : "pm");
+      return "<tr><td>" + hourLabel + "</td><td>" + fmtPct(d.disruption) + "</td><td>" + d.options.toFixed(2) + "</td></tr>";
+    }).join("");
+    tblWrap.innerHTML = "<table class='data-table'><thead><tr><th>Hour</th><th>Disruption rate</th><th>Avg. options</th></tr></thead><tbody>" + rows + "</tbody></table>";
+  }
+
+  /* ============================= CAUSE CHART (horizontal bars) ===== */
+  function buildCauseChart() {
+    var wrap = document.getElementById("causeChartWrap");
+    var rowH = 40, padL = 130, padR = 60, padT = 6, padB = 6, W = 760;
+    var H = causeData.length * rowH + padT + padB;
+    var svg = el("svg", { class: "chart", viewBox: "0 0 " + W + " " + H, role: "img",
+      "aria-label": "Stranding rate by delay cause" });
+
+    var maxStrand = Math.max.apply(null, causeData.map(function(d){return d.strand;}));
+    var barMaxW = W - padL - padR;
+    var scale = function (v) { return v / (maxStrand * 1.15) * barMaxW; };
+
+    causeData.forEach(function (d, i) {
+      var cy = padT + i * rowH;
+      var barH = 20;
+      var barY = cy + (rowH - barH) / 2;
+      var bw = scale(d.strand);
+
+      var label = el("text", { x: padL - 12, y: barY + barH / 2 + 4, class: "axis-label", "text-anchor": "end", fill: "var(--ink)", "font-size": 13, "font-weight": 600 });
+      label.textContent = d.cause;
+      svg.appendChild(label);
+
+      var track = el("rect", { x: padL, y: barY, width: barMaxW, height: barH, rx: 6, fill: "var(--grid)" });
+      svg.appendChild(track);
+
+      var bar = el("rect", { x: padL, y: barY, width: bw, height: barH, rx: 6, fill: "var(--series-1)", opacity: 0.9 });
+      bar.style.cursor = "pointer";
+      svg.appendChild(bar);
+
+      var valLabel = el("text", { x: padL + bw + 8, y: barY + barH / 2 + 4, class: "axis-label", "font-weight": 700, fill: "var(--ink)", "font-size": 13 });
+      valLabel.textContent = fmtPct(d.strand);
+      svg.appendChild(valLabel);
+
+      var hoverTarget = el("rect", { x: 0, y: cy, width: W, height: rowH, fill: "transparent" });
+      hoverTarget.addEventListener("mousemove", function (evt) {
+        var rect = svg.getBoundingClientRect();
+        var sc = W / rect.width;
+        var px = (evt.clientX - rect.left);
+        var py = (evt.clientY - rect.top);
+        showTooltip(px, py,
+          "<div class='t-title'>" + d.cause + "</div>" +
+          "<div class='t-row'>Flights <b>" + d.flights.toLocaleString() + "</b></div>" +
+          "<div class='t-row'>Avg. delay <b>" + Math.round(d.avgDelay) + " min</b></div>" +
+          "<div class='t-row'>Stranding rate <b>" + fmtPct(d.strand) + "</b></div>",
+          rect);
+      });
+      hoverTarget.addEventListener("mouseleave", hideTooltip);
+      svg.appendChild(hoverTarget);
+    });
+
+    wrap.innerHTML = "";
+    wrap.appendChild(svg);
+
+    var tblWrap = document.getElementById("causeTableWrap");
+    var rows = causeData.map(function (d) {
+      return "<tr><td>" + d.cause + "</td><td>" + d.flights.toLocaleString() + "</td><td>" + Math.round(d.avgDelay) + " min</td><td>" + fmtPct(d.strand) + "</td></tr>";
+    }).join("");
+    tblWrap.innerHTML = "<table class='data-table'><thead><tr><th>Cause</th><th>Flights</th><th>Avg. delay</th><th>Stranding rate</th></tr></thead><tbody>" + rows + "</tbody></table>";
+  }
+
+  /* ============================= CARRIER SCATTER ===== */
+  function buildCarrierChart() {
+    var wrap = document.getElementById("carrierChartWrap");
+    var W = 760, H = 420, padL = 50, padR = 24, padT = 20, padB = 40;
+
+    var svg = el("svg", { class: "chart", viewBox: "0 0 " + W + " " + H, role: "img",
+      "aria-label": "Carrier disruption rate versus stranding rate" });
+
+    var xMax = 0.27, yMax = 0.12;
+    var x = function (v) { return padL + v / xMax * (W - padL - padR); };
+    var y = function (v) { return padT + (H - padT - padB) - v / yMax * (H - padT - padB); };
+
+    [0, 0.05, 0.10, 0.15, 0.20, 0.25].forEach(function (t) {
+      var xx = x(t);
+      svg.appendChild(el("line", { x1: xx, x2: xx, y1: padT, y2: H - padB, class: "gridline" }));
+      var lbl = el("text", { x: xx, y: H - padB + 18, class: "axis-label", "text-anchor": "middle" });
+      lbl.textContent = Math.round(t * 100) + "%";
+      svg.appendChild(lbl);
+    });
+    [0, 0.03, 0.06, 0.09, 0.12].forEach(function (t) {
+      var yy = y(t);
+      svg.appendChild(el("line", { x1: padL, x2: W - padR, y1: yy, y2: yy, class: "gridline" }));
+      var lbl = el("text", { x: padL - 8, y: yy + 3, class: "axis-label", "text-anchor": "end" });
+      lbl.textContent = Math.round(t * 100) + "%";
+      svg.appendChild(lbl);
+    });
+    var xAxisLbl = el("text", { x: (W - padR + padL) / 2, y: H - 2, class: "axis-label", "text-anchor": "middle", "font-weight": 600 });
+    xAxisLbl.textContent = "DISRUPTION RATE →";
+    svg.appendChild(xAxisLbl);
+
+    var maxFlights = Math.max.apply(null, carrierData.map(function(d){return d.flights;}));
+    var rScale = function (f) { return 5 + Math.sqrt(f / maxFlights) * 22; };
+
+    carrierData.forEach(function (d) {
+      var cx = x(d.disruption), cy = y(d.strand), r = rScale(d.flights);
+      var color = d.regional ? "var(--series-2)" : "var(--series-1)";
+      var dot = el("circle", { cx: cx, cy: cy, r: r, fill: color, opacity: 0.72, stroke: "var(--surface)", "stroke-width": 1.5 });
+      dot.style.cursor = "pointer";
+      dot.addEventListener("mousemove", function (evt) {
+        var rect = svg.getBoundingClientRect();
+        showTooltip(cx, cy,
+          "<div class='t-title'>" + d.name + " (" + d.code + ")</div>" +
+          "<div class='t-row'>Flights <b>" + d.flights.toLocaleString() + "</b></div>" +
+          "<div class='t-row'>Disruption rate <b>" + fmtPct(d.disruption) + "</b></div>" +
+          "<div class='t-row'>Stranding rate <b>" + fmtPct(d.strand) + "</b></div>" +
+          "<div class='t-row'>" + (d.regional ? "Regional / feeder" : "Mainline / low-cost") + "</div>",
+          rect);
+      });
+      dot.addEventListener("mouseleave", hideTooltip);
+      svg.appendChild(dot);
+    });
+
+    // direct labels for the largest carriers only
+    ["UA","OO","AA","WN","DL"].forEach(function (code) {
+      var d = carrierData.filter(function(c){return c.code===code;})[0];
+      if (!d) return;
+      var cx = x(d.disruption), cy = y(d.strand), r = rScale(d.flights);
+      var lbl = el("text", { x: cx, y: cy - r - 6, class: "axis-label", "text-anchor": "middle", "font-weight": 700, fill: "var(--ink-2)" });
+      lbl.textContent = d.code;
+      svg.appendChild(lbl);
+    });
+
+    wrap.innerHTML = "";
+    wrap.appendChild(svg);
+
+    var tblWrap = document.getElementById("carrierTableWrap");
+    var sorted = carrierData.slice().sort(function(a,b){return b.flights - a.flights;});
+    var rows = sorted.map(function (d) {
+      return "<tr><td>" + d.name + " (" + d.code + ")" + (d.regional ? " · regional" : "") + "</td><td>" + d.flights.toLocaleString() + "</td><td>" + fmtPct(d.disruption) + "</td><td>" + fmtPct(d.strand) + "</td></tr>";
+    }).join("");
+    tblWrap.innerHTML = "<table class='data-table'><thead><tr><th>Carrier</th><th>Flights</th><th>Disruption rate</th><th>Stranding rate</th></tr></thead><tbody>" + rows + "</tbody></table>";
+  }
+
+  /* ============================= AIRPORT BARS ===== */
+  function buildAirportChart() {
+    var wrap = document.getElementById("airportChartWrap");
+    var rowH = 34, padL = 150, padR = 60, padT = 6, padB = 6, W = 760;
+    var H = airportData.length * rowH + padT + padB;
+    var svg = el("svg", { class: "chart", viewBox: "0 0 " + W + " " + H, role: "img",
+      "aria-label": "Worst-stranding airports" });
+
+    var maxStrand = Math.max.apply(null, airportData.map(function(d){return d.strand;}));
+    var barMaxW = W - padL - padR;
+    var scale = function (v) { return v / (maxStrand * 1.1) * barMaxW; };
+
+    airportData.forEach(function (d, i) {
+      var cy = padT + i * rowH;
+      var barH = 18;
+      var barY = cy + (rowH - barH) / 2;
+      var bw = scale(d.strand);
+      var color = d.home ? "var(--series-2)" : "var(--series-1)";
+
+      var label = el("text", { x: padL - 12, y: barY + barH / 2 + 4, class: "axis-label", "text-anchor": "end", fill: d.home ? "var(--series-2)" : "var(--ink)", "font-size": 13, "font-weight": d.home ? 700 : 600 });
+      label.textContent = d.name + (d.home ? "  (home)" : "");
+      svg.appendChild(label);
+
+      var track = el("rect", { x: padL, y: barY, width: barMaxW, height: barH, rx: 5, fill: "var(--grid)" });
+      svg.appendChild(track);
+
+      var bar = el("rect", { x: padL, y: barY, width: bw, height: barH, rx: 5, fill: color, opacity: d.home ? 1 : 0.85 });
+      svg.appendChild(bar);
+
+      var valLabel = el("text", { x: padL + bw + 8, y: barY + barH / 2 + 4, class: "axis-label", "font-weight": 700, fill: "var(--ink)", "font-size": 13 });
+      valLabel.textContent = fmtPct(d.strand, 2);
+      svg.appendChild(valLabel);
+
+      var hoverTarget = el("rect", { x: 0, y: cy, width: W, height: rowH, fill: "transparent" });
+      hoverTarget.addEventListener("mousemove", function (evt) {
+        var rect = svg.getBoundingClientRect();
+        var px = (evt.clientX - rect.left);
+        var py = (evt.clientY - rect.top);
+        showTooltip(px, py,
+          "<div class='t-title'>" + d.name + " (" + d.code + ")" + (d.home ? " — home station" : "") + "</div>" +
+          "<div class='t-row'>Flights <b>" + d.flights.toLocaleString() + "</b></div>" +
+          "<div class='t-row'>Stranding rate <b>" + fmtPct(d.strand, 2) + "</b></div>",
+          rect);
+      });
+      hoverTarget.addEventListener("mouseleave", hideTooltip);
+      svg.appendChild(hoverTarget);
+    });
+
+    wrap.innerHTML = "";
+    wrap.appendChild(svg);
+
+    var tblWrap = document.getElementById("airportTableWrap");
+    var rows = airportData.map(function (d) {
+      return "<tr><td>" + d.name + " (" + d.code + ")" + (d.home ? " · home" : "") + "</td><td>" + d.flights.toLocaleString() + "</td><td>" + fmtPct(d.strand, 2) + "</td></tr>";
+    }).join("");
+    tblWrap.innerHTML = "<table class='data-table'><thead><tr><th>Airport</th><th>Flights</th><th>Stranding rate</th></tr></thead><tbody>" + rows + "</tbody></table>";
+  }
+
+  /* ============================= THEME TOGGLE ============================= */
+  function applyTheme(mode) {
+    if (mode === "auto") document.documentElement.removeAttribute("data-theme");
+    else document.documentElement.setAttribute("data-theme", mode);
+    try { localStorage.setItem("rebooking-dashboard-theme", mode); } catch (e) {}
+    document.querySelectorAll(".theme-toggle button").forEach(function (b) {
+      b.classList.toggle("active", b.getAttribute("data-theme-btn") === mode);
+    });
+    rebuildAll();
+  }
+  document.querySelectorAll(".theme-toggle button").forEach(function (b) {
+    b.addEventListener("click", function () { applyTheme(b.getAttribute("data-theme-btn")); });
+  });
+
+  document.querySelectorAll(".data-toggle-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var targetId = btn.getAttribute("data-target");
+      var target = document.getElementById(targetId);
+      if (!target) return;
+      var willOpen = !target.classList.contains("open");
+      target.classList.toggle("open", willOpen);
+      btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    });
+  });
+
+  function rebuildAll() {
+    buildHourChart();
+    buildCauseChart();
+    buildCarrierChart();
+    buildAirportChart();
+  }
+
+  var savedTheme = "auto";
+  try { savedTheme = localStorage.getItem("rebooking-dashboard-theme") || "auto"; } catch (e) {}
+  applyTheme(savedTheme);
+
+  window.addEventListener("resize", function () {
+    clearTimeout(window.__rbdResize);
+    window.__rbdResize = setTimeout(rebuildAll, 150);
+  });
+})();
+</script>
+
+</body>
+</html>
