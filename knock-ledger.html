@@ -1,0 +1,658 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Knock Ledger</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Knock Ledger">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#F3F5EF;--surface:#FFFFFF;--surface2:#E7ECE3;--ink:#16231A;--ink2:#46564B;--ink3:#76857A;--line:#D5DDD1;
+  --turf:#1E6A44;--turfInk:#FFFFFF;--turfSoft:#D9EADD;--sun:#A8630A;--sunSoft:#F4E4C9;--red:#AE3C2A;--redSoft:#F4DBD4;
+  --shadow:0 1px 2px rgba(22,35,26,.06),0 6px 18px rgba(22,35,26,.06);
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"Barlow",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){color-scheme:dark;
+    --bg:#0D1410;--surface:#15201A;--surface2:#1D2A22;--ink:#E3EBE5;--ink2:#A7B5AB;--ink3:#7C8A80;--line:#29382E;
+    --turf:#5BBF88;--turfInk:#07130C;--turfSoft:#1B3727;--sun:#EFB25B;--sunSoft:#382A15;--red:#EE8068;--redSoft:#3B1F18;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.25);}
+}
+:root[data-theme="dark"]{color-scheme:dark;
+  --bg:#0D1410;--surface:#15201A;--surface2:#1D2A22;--ink:#E3EBE5;--ink2:#A7B5AB;--ink3:#7C8A80;--line:#29382E;
+  --turf:#5BBF88;--turfInk:#07130C;--turfSoft:#1B3727;--sun:#EFB25B;--sunSoft:#382A15;--red:#EE8068;--redSoft:#3B1F18;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 22px rgba(0,0,0,.25);}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+#app{max-width:520px;margin:0 auto;padding-inline:16px;padding-block:0 110px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--turf);outline-offset:2px}
+.num,.tab-num{font-variant-numeric:tabular-nums}
+
+/* top */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px 10px}
+.brand{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.02em;text-transform:uppercase;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.brand i{display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--turf);transform:rotate(45deg)}
+.seg{display:flex;background:var(--surface2);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;padding:7px 14px;border-radius:999px;font-weight:600;font-size:14px;color:var(--ink2)}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+
+.note{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--sunSoft);color:var(--ink);border-radius:12px;padding:10px 12px;font-size:14px;margin-block:0 12px}
+.note button{border:0;background:var(--ink);color:var(--bg);border-radius:8px;padding:7px 10px;font-weight:600;font-size:13px;white-space:nowrap}
+
+/* hero */
+.hero{background:var(--turf);color:var(--turfInk);border-radius:18px;padding:18px 18px 16px;display:grid;gap:10px}
+.hero .lab{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.85;font-weight:600}
+.hero .big{font-family:var(--display);font-weight:700;font-size:56px;line-height:.95}
+.hero .sub{font-size:14px;opacity:.9;display:flex;flex-wrap:wrap;gap:4px 14px}
+.bar{height:10px;border-radius:99px;background:color-mix(in srgb,var(--turfInk) 22%,transparent);overflow:hidden}
+.bar>span{display:block;height:100%;background:var(--turfInk);border-radius:99px}
+.hero .goal{display:flex;justify-content:space-between;font-size:13px;opacity:.95}
+
+.stack{display:grid;gap:14px;margin-top:14px}
+.card{background:var(--surface);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.card h2{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink2);margin:0 0 10px}
+.muted{color:var(--ink3);font-size:13px}
+
+/* doors counter */
+.doors{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:10px}
+.doors .count{font-family:var(--display);font-weight:700;font-size:44px;text-align:center;line-height:1}
+.round{width:52px;height:52px;border-radius:14px;border:1.5px solid var(--line);background:var(--surface2);font-size:20px;font-weight:600}
+.round.plus{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.typein{display:flex;gap:8px;align-items:center;margin-top:10px;font-size:13px;color:var(--ink3)}
+.typein input{width:90px;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg)}
+
+.bigbtn{width:100%;border:0;border-radius:16px;padding:18px;font-family:var(--display);font-weight:700;font-size:24px;letter-spacing:.03em;text-transform:uppercase;background:var(--ink);color:var(--bg);box-shadow:var(--shadow)}
+.bigrow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bigbtn.alt{background:var(--surface);color:var(--ink);border:1.5px solid var(--line)}
+
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.kpi{background:var(--surface2);border-radius:12px;padding:10px 8px;text-align:center}
+.kpi b{display:block;font-family:var(--display);font-size:24px;font-weight:700;line-height:1.1}
+.kpi span{font-size:11px;color:var(--ink2);text-transform:uppercase;letter-spacing:.06em}
+
+/* list */
+.list{display:grid}
+.row{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:12px 0;border-top:1px solid var(--line);align-items:center}
+.row:first-child{border-top:0}
+.row .who{font-weight:600}
+.row .meta{font-size:13px;color:var(--ink3)}
+.row .amt{font-family:var(--display);font-weight:700;font-size:20px;text-align:right}
+.row .ctl{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;background:var(--surface2);color:var(--ink2);border:0}
+.chip.good{background:var(--turfSoft);color:var(--turf)}
+.chip.wait{background:var(--sunSoft);color:var(--sun)}
+.chip.bad{background:var(--redSoft);color:var(--red)}
+select.status{appearance:none;-webkit-appearance:none;border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:7px 28px 7px 10px;font-size:14px;font-weight:600;background-image:linear-gradient(45deg,transparent 50%,var(--ink3) 50%),linear-gradient(135deg,var(--ink3) 50%,transparent 50%);background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+.paidtog{border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:7px 10px;font-size:14px;font-weight:600;color:var(--ink2)}
+.paidtog[aria-pressed="true"]{background:var(--turfSoft);border-color:transparent;color:var(--turf)}
+.empty{padding:18px 4px;color:var(--ink3);font-size:14px;text-align:center}
+
+.filter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.filter button{border:1.5px solid var(--line);background:transparent;border-radius:99px;padding:6px 12px;font-size:14px;font-weight:600;color:var(--ink2)}
+.filter button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+
+.totals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tot{border-radius:12px;padding:12px 10px}
+.tot b{display:block;font-family:var(--display);font-size:26px;font-weight:700;line-height:1.05}
+.tot span{font-size:12px;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.tot.owed{background:var(--turfSoft);color:var(--turf)}
+.tot.pend{background:var(--sunSoft);color:var(--sun)}
+.tot.claw{background:var(--redSoft);color:var(--red)}
+
+/* insights */
+.hours{display:grid;gap:7px}
+.hr{display:grid;grid-template-columns:52px 1fr 64px;align-items:center;gap:8px;font-size:13px}
+.hr .track{height:14px;background:var(--surface2);border-radius:6px;overflow:hidden}
+.hr .fill{height:100%;background:var(--turf);border-radius:6px}
+.hr .fill.top{background:var(--sun)}
+.hr .v{text-align:right;color:var(--ink2)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);font-weight:600;padding:0 0 6px}
+td{padding:9px 0;border-top:1px solid var(--line)}
+td.r,th.r{text-align:right}
+.pace{font-size:15px}
+.pace b{font-family:var(--display);font-size:22px}
+
+/* setup */
+.field{display:grid;gap:6px;margin-bottom:12px}
+.field label{font-size:13px;font-weight:600;color:var(--ink2)}
+.field input,.field select,.field textarea{padding:11px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg);width:100%;box-sizing:border-box}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin-bottom:12px}
+.check input{width:20px;height:20px;margin-top:1px;accent-color:var(--turf)}
+.btn{border:1.5px solid var(--line);background:var(--surface2);border-radius:12px;padding:11px 14px;font-weight:600}
+.btn.dark{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.warn{background:var(--redSoft);color:var(--red);border-color:transparent}
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.prose{font-size:14px;color:var(--ink2);max-width:60ch}
+.prose p{margin:0 0 8px}
+
+/* tabs */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
+.tabs .in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+.tabs button{border:0;background:transparent;display:grid;justify-items:center;gap:2px;padding:6px 0;font-size:12px;font-weight:600;color:var(--ink3)}
+.tabs button svg{width:24px;height:24px}
+.tabs button[aria-current="page"]{color:var(--turf)}
+
+/* sheet */
+.scrim{position:fixed;inset:0;z-index:10;background:rgba(10,18,13,.45);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:520px;border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));box-sizing:border-box;max-height:88%;overflow:auto}
+.sheet h3{font-family:var(--display);font-weight:700;font-size:26px;text-transform:uppercase;letter-spacing:.02em;margin:0 0 12px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:12;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;max-width:calc(100% - 32px);box-shadow:var(--shadow)}
+@media (prefers-reduced-motion:no-preference){.bar>span,.hr .fill{transition:width .4s ease}.sheet{animation:up .22s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}}}
+.linkbtn{border:0;background:transparent;color:var(--ink2);font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:3px;padding:6px 2px}
+.viewseg{display:flex;background:var(--surface2);border-radius:12px;padding:3px;gap:3px}
+.viewseg button{flex:1;border:0;background:transparent;padding:9px;border-radius:10px;font-weight:600;color:var(--ink2)}
+.viewseg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.period{padding:14px 0;border-top:1px solid var(--line);display:grid;gap:8px}
+.period:first-child{border-top:0}
+.period .ph{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.period .ph b{font-weight:600}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.pgrid div{background:var(--surface2);border-radius:10px;padding:8px}
+.pgrid b{display:block;font-family:var(--display);font-size:20px;font-weight:700}
+.pgrid span{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2)}
+.checkrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:14px}
+.checkrow input{width:110px;padding:8px 10px;border-radius:10px;border:1.5px solid var(--line);background:var(--bg)}
+.verdict{font-size:14px;font-weight:600;border-radius:10px;padding:8px 10px}
+.verdict.ok{background:var(--turfSoft);color:var(--turf)}
+.verdict.short{background:var(--redSoft);color:var(--red)}
+.verdict.over{background:var(--sunSoft);color:var(--sun)}
+.tierrow{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px}
+.tierrow .field{margin:0}
+.iconbtn{width:44px;height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface2);font-size:20px;line-height:1}
+.tiercard{display:grid;gap:8px}
+.tiercard .t{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.tiercard .t b{font-family:var(--display);font-size:26px;font-weight:700}
+.tbar{height:10px;background:var(--surface2);border-radius:99px;overflow:hidden}
+.tbar span{display:block;height:100%;background:var(--sun);border-radius:99px}
+.feedback{background:var(--surface);border:1.5px dashed var(--line);border-radius:16px;padding:14px 16px;display:grid;gap:8px}
+.feedback a.btn{text-align:center;text-decoration:none;display:block}
+.danger{background:var(--redSoft);color:var(--red);border-color:transparent}
+@media (max-width:380px){.kpis{grid-template-columns:repeat(2,1fr)}.hero .big{font-size:48px}}
+</style>
+</head><body style="margin:0">
+
+<div id="app">
+  <header class="top">
+    <div class="brand"><i aria-hidden="true"></i>Knock Ledger</div>
+    <div class="seg" id="roleSeg" aria-label="Your role">
+      <button type="button" data-role="setter" aria-pressed="true">Setter</button>
+      <button type="button" data-role="closer" aria-pressed="false">Closer</button>
+    </div>
+  </header>
+  <div id="exampleBar" class="note" hidden>
+    <span>This is an example week so you can see how it works.</span>
+    <button type="button" data-act="fresh-now">Start my own</button>
+  </div>
+  <main id="view"></main>
+</div>
+
+<nav class="tabs" aria-label="Sections"><div class="in">
+  <button type="button" data-tab="log" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>Today</button>
+  <button type="button" data-tab="pay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></svg>Pay</button>
+  <button type="button" data-tab="insights"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Patterns</button>
+  <button type="button" data-tab="setup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>Setup</button>
+</div></nav>
+
+<div id="scrim" class="scrim" hidden></div>
+<div id="toast" class="toast" hidden role="status"></div>
+
+<script>
+(function(){
+const KEY='knockledger.v1';
+const NATE_PHONE='+18325076699', NATE_PRETTY='(832) 507-6699';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>(n<0?'-':'')+'$'+Math.round(Math.abs(n)).toLocaleString('en-US');
+const pct=n=>isFinite(n)&&!isNaN(n)?Math.round(n*100)+'%':'–';
+const pad=n=>String(n).padStart(2,'0');
+const dkey=d=>{const x=new Date(d);return x.getFullYear()+'-'+pad(x.getMonth()+1)+'-'+pad(x.getDate())};
+const parseKey=k=>{const[y,m,d]=String(k).split('-').map(Number);return new Date(y,(m||1)-1,d||1)};
+const todayKey=()=>dkey(new Date());
+const uid=()=>Math.random().toString(36).slice(2,10);
+const num=v=>{const n=parseFloat(String(v==null?'':v).replace(/[^0-9.]/g,''));return isNaN(n)?0:n};
+function weekStart(d){const x=d?new Date(d):new Date();x.setHours(0,0,0,0);x.setDate(x.getDate()-((x.getDay()+6)%7));return x}
+const inThisWeek=iso=>new Date(iso)>=weekStart();
+const hourLabel=h=>{const s=h>=12?'pm':'am';const v=h%12||12;return v+s};
+const timeLabel=iso=>{const d=new Date(iso);return hourLabel(d.getHours()).replace(/(am|pm)/,':'+pad(d.getMinutes())+'$1')};
+const shortDate=d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+const dayLabel=iso=>{const d=new Date(iso),k=dkey(d);if(k===todayKey())return 'Today';const y=new Date();y.setDate(y.getDate()-1);if(k===dkey(y))return 'Yesterday';return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'})};
+
+const STATUS={
+  setter:[['set','Set'],['sat','Showed'],['closed','Closed'],['noshow','No-show'],['canceled','Canceled']],
+  closer:[['sat','Sat, no sale'],['closed','Sold'],['serviced','First service done'],['canceled','Canceled']]
+};
+const TONE={set:'wait',sat:'good',closed:'good',serviced:'good',noshow:'',canceled:'bad'};
+const COUNTS={setter:['sat','closed'],closer:['closed','serviced']};
+
+function defaults(){return{role:'setter',name:'',goal:1000,seasonStart:'',
+  pay:{sat:40,close:60,mode:'pct',pct:10,flat:75,afterService:true,setterTiers:[],closerTiers:[],retro:false,freq:'weekly',anchor:dkey(weekStart())},
+  checks:{},doors:{},deals:[],example:false}}
+
+/* ---------- tiers ---------- */
+let ordCache=new WeakMap();
+function ordinals(st){
+  let c=ordCache.get(st);if(c)return c;
+  c={map:{},count:{setter:0,closer:0}};
+  const start=st.seasonStart?parseKey(st.seasonStart):null;
+  ['setter','closer'].forEach(role=>{
+    st.deals.filter(d=>d.role===role&&COUNTS[role].includes(d.status)&&(!start||new Date(d.at)>=start))
+      .sort((a,b)=>new Date(a.at)-new Date(b.at)).forEach((d,i)=>{c.map[d.id]=i+1});
+    c.count[role]=Object.values(c.map).length-(role==='closer'?c.count.setter:0);
+  });
+  c.count.setter=st.deals.filter(d=>d.role==='setter'&&c.map[d.id]).length;
+  c.count.closer=st.deals.filter(d=>d.role==='closer'&&c.map[d.id]).length;
+  ordCache.set(st,c);return c;
+}
+function tierList(p,role){return(role==='setter'?p.setterTiers:p.closerTiers)||[]}
+function baseRate(p,role){return role==='setter'?num(p.sat):(p.mode==='pct'?num(p.pct):num(p.flat))}
+function rateAt(p,role,n){let r=baseRate(p,role);tierList(p,role).slice().sort((a,b)=>num(a.from)-num(b.from)).forEach(t=>{if(num(t.from)>0&&n>=num(t.from))r=num(t.rate)});return r}
+function tierInfo(st,role){
+  const p=st.pay,tiers=tierList(p,role).filter(t=>num(t.from)>1).slice().sort((a,b)=>num(a.from)-num(b.from));
+  if(!tiers.length)return null;
+  const n=ordinals(st).count[role];let level=1;tiers.forEach((t,i)=>{if(n>=num(t.from))level=i+2});
+  const next=tiers.find(t=>n<num(t.from));
+  return{n,level,rate:rateAt(p,role,n||1),next,prevFrom:level===1?0:num(tiers[level-2].from)};
+}
+function dealRate(d,st){
+  const o=ordinals(st);const n=o.map[d.id]||o.count[d.role]+1;
+  return rateAt(st.pay,d.role,st.pay.retro?Math.max(n,o.count[d.role]):n);
+}
+
+/* ---------- money ---------- */
+function commission(d,st){const r=dealRate(d,st);return st.pay.mode==='pct'?num(d.value)*r/100:r}
+function earned(d,st){
+  st=st||S;const p=st.pay;
+  if(d.role==='setter'){let e=0;if(d.status==='sat'||d.status==='closed')e+=dealRate(d,st);if(d.status==='closed')e+=num(p.close);return e}
+  if(d.status==='serviced')return commission(d,st);
+  if(d.status==='closed'&&!p.afterService)return commission(d,st);
+  return 0;
+}
+function pending(d,st){
+  st=st||S;
+  if(d.role==='setter')return d.status==='set'?dealRate(d,st):0;
+  return d.status==='closed'&&st.pay.afterService?commission(d,st):0;
+}
+
+/* ---------- example ---------- */
+function seeded(seed){return function(){seed=(seed*16807)%2147483647;return(seed-1)/2147483646}}
+function pick(r,arr){return arr[Math.floor(r()*arr.length)]}
+function weighted(r,pairs){let t=r(),a=0;for(const[v,w]of pairs){a+=w;if(t<=a)return v}return pairs[pairs.length-1][0]}
+function exampleData(){
+  const s=defaults();s.example=true;const r=seeded(20260923);
+  s.pay.setterTiers=[{from:15,rate:50},{from:30,rate:60}];s.pay.closerTiers=[{from:10,rate:12},{from:25,rate:14}];
+  const areas=['Tech Terrace','Kelsey Park','Lakeridge','Wolfforth','Maxey Park'];
+  const names=['Garcia','Nguyen','Patel','Johnson','Reyes','Brooks','Miller','Davis','Lopez','Hall','Young','King','Wright','Scott','Green','Adams','Baker','Ortiz','Price','Shaw'];
+  const streets=['19th St','Elgin Ave','82nd St','Quinton Ave','Utica Ave','98th St','Indiana Ave','Ave U'];
+  const hourW=[[12,.08],[13,.1],[14,.1],[15,.12],[16,.14],[17,.2],[18,.18],[19,.08]];
+  for(let back=20;back>=0;back--){
+    const day=new Date();day.setDate(day.getDate()-back);if(day.getDay()===0&&back>0)continue;const k=dkey(day);
+    s.doors[k]=back===0?58:85+Math.floor(r()*55);
+    const nSets=back===0?2:1+Math.floor(r()*3);
+    for(let i=0;i<nSets;i++){
+      const h=weighted(r,hourW);const t=new Date(day);t.setHours(h,Math.floor(r()*60),0,0);
+      const area=h>=17?pick(r,areas.slice(0,3)):pick(r,areas);
+      const st=back>=2?weighted(r,[['closed',.34],['sat',.26],['noshow',.26],['canceled',.14]]):back===1?weighted(r,[['sat',.45],['set',.35],['noshow',.2]]):'set';
+      s.deals.push({id:uid(),role:'setter',at:t.toISOString(),who:pick(r,names).charAt(0)+'., '+pick(r,streets),area,status:st,paid:false,paidAmt:0});
+    }
+    const nSits=back===0?1:1+Math.floor(r()*2);
+    for(let i=0;i<nSits;i++){
+      const h=weighted(r,hourW);const t=new Date(day);t.setHours(h,Math.floor(r()*60),0,0);
+      const st=back>=3?weighted(r,[['serviced',.32],['closed',.13],['sat',.45],['canceled',.1]]):weighted(r,[['closed',.4],['sat',.6]]);
+      const value=st==='sat'?0:[480,540,600,660,720,840][Math.floor(r()*6)];
+      s.deals.push({id:uid(),role:'closer',at:t.toISOString(),who:pick(r,names).charAt(0)+'., '+pick(r,streets),area:pick(r,areas),status:st,value,paid:false,paidAmt:0});
+    }
+  }
+  // paid through the end of last week's pay period
+  const cutoff=weekStart();
+  s.deals.forEach(d=>{if(new Date(d.at)<cutoff&&earned(d,s)>0){d.paid=true;d.paidAmt=earned(d,s)}});
+  const c=s.deals.find(d=>d.role==='setter'&&d.paid&&d.status==='closed');if(c)c.status='canceled';
+  // example paychecks: last week short by one show, the week before matched
+  ordCache=new WeakMap();
+  const ps=periods(s,'setter');if(ps[1])s.checks['setter|'+ps[1].key]=Math.max(0,Math.round(ps[1].earned-40));if(ps[2])s.checks['setter|'+ps[2].key]=Math.round(ps[2].earned);
+  const pc=periods(s,'closer');if(pc[1])s.checks['closer|'+pc[1].key]=Math.round(pc[1].earned);
+  return s;
+}
+
+/* ---------- pay periods ---------- */
+function periodLen(p){return p.freq==='biweekly'?14:7}
+function periodStartFor(date,p){
+  const a=parseKey(p.anchor||dkey(weekStart()));a.setHours(0,0,0,0);const d=new Date(date);d.setHours(0,0,0,0);
+  const len=periodLen(p);const diff=Math.floor((d-a)/86400000);const k=Math.floor(diff/len);
+  const s=new Date(a);s.setDate(a.getDate()+k*len);return s;
+}
+function periods(st,role){
+  const p=st.pay,len=periodLen(p);const list=st.deals.filter(d=>d.role===role);
+  const map={};
+  const cur=periodStartFor(new Date(),p);map[dkey(cur)]={start:cur,deals:[]};
+  list.forEach(d=>{const s=periodStartFor(d.at,p);const k=dkey(s);(map[k]=map[k]||{start:s,deals:[]}).deals.push(d)});
+  return Object.entries(map).map(([key,o])=>{
+    const end=new Date(o.start);end.setDate(end.getDate()+len-1);
+    let e=0,pd=0,pe=0;o.deals.forEach(d=>{e+=earned(d,st);pe+=pending(d,st);if(d.paid)pd+=num(d.paidAmt)});
+    return{key,start:o.start,end,earned:e,paid:pd,pending:pe,n:o.deals.length,current:key===dkey(cur)};
+  }).sort((a,b)=>b.start-a.start);
+}
+
+/* ---------- state ---------- */
+let S,storageOK=true;
+function normalize(o){const d=defaults();const s=Object.assign(d,o||{});s.pay=Object.assign(defaults().pay,(o&&o.pay)||{});s.checks=s.checks||{};s.doors=s.doors||{};s.deals=Array.isArray(s.deals)?s.deals:[];return s}
+function load(){try{const raw=localStorage.getItem(KEY);if(raw){S=normalize(JSON.parse(raw));return}}catch(e){storageOK=false}S=exampleData()}
+function save(){ordCache=new WeakMap();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){storageOK=false}}
+load();
+
+let tab='log',payFilter='owed',payMode='deals',confirmFresh=false;
+const mine=()=>S.deals.filter(d=>d.role===S.role).sort((a,b)=>new Date(b.at)-new Date(a.at));
+
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>t.hidden=true,2800)}
+function leaveExample(){if(S.example){S=normalize({role:S.role});toast('Cleared the example. This is your own ledger now.')}}
+
+function totals(list){
+  let owed=0,pend=0,paid=0,claw=0,week=0;
+  list.forEach(d=>{const e=earned(d);if(d.paid){paid+=num(d.paidAmt);if(num(d.paidAmt)>e)claw+=num(d.paidAmt)-e}else owed+=e;pend+=pending(d);if(inThisWeek(d.at))week+=e});
+  return{owed,pend,paid,claw,week};
+}
+function weekDoors(){const ws=weekStart();let n=0;for(const k in S.doors){if(parseKey(k)>=ws)n+=num(S.doors[k])}return n}
+function rates(list){
+  const sets=list.length;const showed=list.filter(d=>d.status==='sat'||d.status==='closed').length;
+  const decided=list.filter(d=>['sat','closed','noshow'].includes(d.status)).length;
+  const closed=list.filter(d=>d.status==='closed').length;
+  return{sets,showRate:decided?showed/decided:NaN,closeOfSat:showed?closed/showed:NaN,closed};
+}
+function closerRates(list){
+  const sits=list.length;const soldL=list.filter(d=>['closed','serviced'].includes(d.status));
+  const vals=soldL.map(d=>num(d.value));
+  return{sits,sold:soldL.length,closeRate:sits?soldL.length/sits:NaN,avg:vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:NaN};
+}
+const rateText=(role,r)=>role==='setter'?money(r)+' a show':(S.pay.mode==='pct'?r+'%':money(r)+' a sale');
+const unit=role=>role==='setter'?'shows':'sales';
+
+/* ---------- views ---------- */
+function heroHTML(t){
+  const g=num(S.goal),p=g?Math.min(1,t.week/g):0;
+  return `<section class="hero" aria-label="Your money">
+    <div class="lab">Owed to you</div>
+    <div class="big num">${money(t.owed)}</div>
+    <div class="sub num"><span>${S.role==='setter'?'If your open sets show':'Waiting on first service'}: <b>${money(t.pend)}</b></span><span>Paid so far: <b>${money(t.paid)}</b></span>${t.claw>0?`<span>Clawed back: <b>${money(t.claw)}</b></span>`:''}</div>
+    <div class="bar" aria-hidden="true"><span style="width:${Math.round(p*100)}%"></span></div>
+    <div class="goal num"><span>This week: ${money(t.week)}</span><span>Goal ${money(g)}</span></div>
+  </section>`;
+}
+function tierCardHTML(){
+  const ti=tierInfo(S,S.role);if(!ti)return '';
+  const span=ti.next?num(ti.next.from)-ti.prevFrom:1,done=ti.next?ti.n-ti.prevFrom:1;
+  return `<section class="card tiercard"><h2 style="margin:0">Your tier</h2>
+    <div class="t"><b class="num">Tier ${ti.level}</b><span class="num">${rateText(S.role,ti.rate)}</span></div>
+    <div class="tbar" aria-hidden="true"><span style="width:${Math.max(4,Math.round(Math.min(1,done/span)*100))}%"></span></div>
+    <div class="muted num">${ti.next?`${ti.n} ${unit(S.role)} this season. ${num(ti.next.from)-ti.n} more to Tier ${ti.level+1} at ${rateText(S.role,num(ti.next.rate))}.`:`${ti.n} ${unit(S.role)} this season. You’re at the top tier.`}</div>
+  </section>`;
+}
+function statusControl(d){
+  return `<select class="status" data-id="${d.id}" aria-label="Status for ${esc(d.who)}">${STATUS[d.role].map(([v,l])=>`<option value="${v}"${d.status===v?' selected':''}>${l}</option>`).join('')}</select>`;
+}
+function rowHTML(d,showDay){
+  const e=earned(d),pe=pending(d);
+  const lab=(STATUS[d.role].find(x=>x[0]===d.status)||['',''])[1];
+  const clawed=d.paid&&num(d.paidAmt)>e;
+  const amt=d.paid?`<span class="amt num">${money(d.paidAmt)}</span>`:e>0?`<span class="amt num">${money(e)}</span>`:pe>0?`<span class="amt num" style="color:var(--sun)">${money(pe)}</span>`:`<span class="amt num" style="color:var(--ink3)">$0</span>`;
+  return `<div class="row">
+    <div><div class="who">${esc(d.who)}</div><div class="meta">${showDay?dayLabel(d.at)+' · ':''}${timeLabel(d.at)}${d.area?' · '+esc(d.area):''}${d.role==='closer'&&num(d.value)?' · '+money(d.value)+' plan':''}</div></div>
+    ${amt}
+    <div class="ctl">${statusControl(d)}
+      <button type="button" class="paidtog" data-paid="${d.id}" aria-pressed="${d.paid?'true':'false'}">${d.paid?'Paid':'Mark paid'}</button>
+      ${clawed?`<span class="chip bad">Clawback ${money(num(d.paidAmt)-e)}</span>`:`<span class="chip ${TONE[d.status]||''}">${lab}</span>`}
+      <button type="button" class="linkbtn" data-edit="${d.id}" style="margin-left:auto">Edit</button>
+    </div>
+  </div>`;
+}
+function feedbackHTML(){
+  const body=encodeURIComponent('Knock Ledger feedback: ');
+  return `<section class="feedback"><div><b>Missing something?</b> <span class="muted">Tell Naté. He’s building this with reps like you.</span></div>
+    <a class="btn dark" href="sms:${NATE_PHONE}?&body=${body}">Text Naté what’s missing</a>
+    <div class="muted num">If the button doesn’t open Messages, text <span style="user-select:all">${NATE_PRETTY}</span>.</div></section>`;
+}
+
+function viewLog(){
+  const list=mine(),t=totals(list),tk=todayKey();
+  const todays=list.filter(d=>dkey(d.at)===tk);
+  let h=heroHTML(t)+'<div class="stack">';
+  if(S.role==='setter'){
+    const doors=num(S.doors[tk]);const wd=weekDoors();const wk=list.filter(d=>inThisWeek(d.at));const r=rates(wk);
+    h+=`<section class="card"><h2>Doors today</h2>
+      <div class="doors"><button type="button" class="round" data-doors="-1" aria-label="Minus one door">&minus;</button>
+      <div class="count num" aria-live="polite">${doors}</div>
+      <button type="button" class="round plus" data-doors="1" aria-label="Plus one door">+1</button>
+      <button type="button" class="round plus" data-doors="10" aria-label="Plus ten doors">+10</button></div>
+      <div class="typein"><label for="doorsTyped">Or type today’s total from your company app</label><input id="doorsTyped" inputmode="numeric" pattern="[0-9]*" value="${doors||''}" placeholder="0"></div>
+    </section>
+    <button type="button" class="bigbtn" data-add="setter">+ Appointment set</button>
+    <section class="card"><h2>This week</h2><div class="kpis">
+      <div class="kpi"><b class="num">${wd}</b><span>Doors</span></div>
+      <div class="kpi"><b class="num">${r.sets}</b><span>Sets</span></div>
+      <div class="kpi"><b class="num">${wd?pct(r.sets/wd):'–'}</b><span>Door to set</span></div>
+      <div class="kpi"><b class="num">${pct(r.showRate)}</b><span>Show rate</span></div>
+    </div></section>`;
+  }else{
+    const wk=list.filter(d=>inThisWeek(d.at));const r=closerRates(wk);
+    h+=`<div class="bigrow"><button type="button" class="bigbtn" data-add="sale">+ Sale</button><button type="button" class="bigbtn alt" data-add="sit">+ Sit, no sale</button></div>
+    <section class="card"><h2>This week</h2><div class="kpis">
+      <div class="kpi"><b class="num">${r.sits}</b><span>Sits</span></div>
+      <div class="kpi"><b class="num">${r.sold}</b><span>Sales</span></div>
+      <div class="kpi"><b class="num">${pct(r.closeRate)}</b><span>Close rate</span></div>
+      <div class="kpi"><b class="num">${isNaN(r.avg)?'–':money(r.avg)}</b><span>Avg sale</span></div>
+    </div></section>`;
+  }
+  h+=tierCardHTML();
+  h+=`<section class="card"><h2>Today</h2><div class="list">${todays.length?todays.map(d=>rowHTML(d,false)).join(''):`<div class="empty">Nothing logged yet today. Tap the big button after each ${S.role==='setter'?'appointment you set':'sit'}.</div>`}</div></section>`;
+  h+=feedbackHTML()+'</div>';
+  return h;
+}
+
+function viewPay(){
+  const list=mine(),t=totals(list);
+  let h=`<div class="stack" style="margin-top:0">
+    <div class="viewseg" role="group" aria-label="View pay"><button type="button" data-paymode="deals" aria-pressed="${payMode==='deals'}">By deal</button><button type="button" data-paymode="checks" aria-pressed="${payMode==='checks'}">By paycheck</button></div>
+    <div class="totals">
+      <div class="tot owed"><b class="num">${money(t.owed)}</b><span>Owed</span></div>
+      <div class="tot pend"><b class="num">${money(t.pend)}</b><span>Pending</span></div>
+      <div class="tot ${t.claw>0?'claw':'owed'}" ${t.claw>0?'':'style="background:var(--surface2);color:var(--ink2)"'}><b class="num">${money(t.claw>0?t.claw:t.paid)}</b><span>${t.claw>0?'Clawed back':'Paid'}</span></div>
+    </div>`;
+  if(payMode==='deals'){
+    const f={owed:d=>!d.paid&&earned(d)>0,pending:d=>!d.paid&&pending(d)>0,paid:d=>d.paid,all:()=>true}[payFilter];
+    const rows=list.filter(f);
+    h+=`<p class="muted" style="margin:0">Anything still in Owed after payday is money to ask your manager about.</p>
+    <section class="card">
+      <div class="filter" role="group" aria-label="Show">${[['owed','Owed'],['pending','Pending'],['paid','Paid'],['all','All']].map(([v,l])=>`<button type="button" data-filter="${v}" aria-pressed="${payFilter===v}">${l}</button>`).join('')}</div>
+      <div class="list">${rows.length?rows.map(d=>rowHTML(d,true)).join(''):'<div class="empty">Nothing here.</div>'}</div>
+    </section>`;
+  }else{
+    const ps=periods(S,S.role);
+    h+=`<p class="muted" style="margin:0">Each block is one ${S.pay.freq==='biweekly'?'two-week':'weekly'} pay period of work. Type what your check actually paid for it and Knock Ledger shows if anything is missing. Change the period on Setup.</p>
+    <section class="card"><div class="list">${ps.map(p=>{
+      const ck=S.checks[S.role+'|'+p.key];const has=ck!==undefined&&ck!==''&&ck!==null;
+      const diff=has?p.earned-num(ck):0;
+      const verdict=!has?'':Math.abs(diff)<1?`<div class="verdict ok">Matches what you earned.</div>`:diff>0?`<div class="verdict short num">Check looks short by ${money(diff)}. Worth asking your manager.</div>`:`<div class="verdict over num">Check was ${money(-diff)} more than you logged. A bonus, or a log you missed?</div>`;
+      return `<div class="period">
+        <div class="ph"><b class="num">${shortDate(p.start)} to ${shortDate(p.end)}</b><span class="muted">${p.current?'This period':p.n+' logged'}</span></div>
+        <div class="pgrid"><div><b class="num">${money(p.earned)}</b><span>Earned</span></div><div><b class="num">${money(p.pending)}</b><span>Pending</span></div><div><b class="num">${money(p.paid)}</b><span>Marked paid</span></div></div>
+        ${p.current?'<div class="muted">Still in progress.</div>':`<div class="checkrow"><label for="ck_${p.key}">My check paid</label><input id="ck_${p.key}" data-check="${p.key}" inputmode="decimal" placeholder="$0" value="${has?esc(ck):''}"></div>${verdict}`}
+      </div>`}).join('')}</div></section>`;
+  }
+  return h+'</div>';
+}
+
+function hourBuckets(list,okFn){
+  const b={};list.forEach(d=>{const hh=new Date(d.at).getHours();b[hh]=b[hh]||{n:0,ok:0};b[hh].n++;if(okFn(d))b[hh].ok++});
+  return Object.keys(b).map(Number).sort((a,z)=>a-z).map(hh=>({h:hh,...b[hh]}));
+}
+function viewInsights(){
+  const list=mine();const t=totals(list);
+  let h='<div class="stack" style="margin-top:0">';
+  const g=num(S.goal),left=Math.max(0,g-t.week);
+  if(S.role==='setter'){
+    const r=rates(list);const doorsAll=Object.values(S.doors).reduce((a,b)=>a+num(b),0);
+    const perSet=r.sets?list.reduce((a,d)=>a+earned(d),0)/r.sets:0;
+    const setsNeeded=perSet?Math.ceil(left/perSet):NaN;const dts=doorsAll?r.sets/doorsAll:NaN;
+    h+=`<section class="card"><h2>Pace to your goal</h2><div class="pace">${left<=0?`You hit your ${money(g)} goal this week.`:`<b class="num">${money(left)}</b> to go this week. At ${money(perSet)} earned per set, that’s about <b class="num">${isNaN(setsNeeded)?'–':setsNeeded}</b> more sets${!isNaN(dts)&&dts>0&&!isNaN(setsNeeded)?`, or roughly <b class="num">${Math.ceil(setsNeeded/dts)}</b> doors`:''}.`}</div></section>`;
+    const hb=hourBuckets(list,d=>d.status==='sat'||d.status==='closed');const mx=Math.max(1,...hb.map(x=>x.n));
+    const best=hb.reduce((a,x)=>x.n>(a?a.n:0)?x:a,null);
+    h+=`<section class="card"><h2>When your sets happen</h2>${hb.length?`<div class="hours">${hb.map(x=>`<div class="hr"><span class="num">${hourLabel(x.h)}</span><div class="track"><div class="fill${best&&x.h===best.h?' top':''}" style="width:${Math.round(x.n/mx*100)}%"></div></div><span class="v num">${x.n} set${x.n>1?'s':''}</span></div>`).join('')}</div><p class="muted" style="margin:10px 0 0">${best?`Your best hour so far is ${hourLabel(best.h)}. Protect it: be on doors, not on a break.`:''}</p>`:'<div class="empty">Log a few sets to see your best hours.</div>'}</section>`;
+    const areas={};list.forEach(d=>{const a=d.area||'No area';(areas[a]=areas[a]||[]).push(d)});
+    const rowsA=Object.entries(areas).map(([a,ds])=>({a,...rates(ds)})).sort((x,y)=>y.sets-x.sets);
+    h+=`<section class="card"><h2>By area</h2>${rowsA.length?`<div style="overflow-x:auto"><table><thead><tr><th>Area</th><th class="r">Sets</th><th class="r">Show rate</th><th class="r">Closed</th></tr></thead><tbody>${rowsA.map(x=>`<tr><td>${esc(x.a)}</td><td class="r num">${x.sets}</td><td class="r num">${pct(x.showRate)}</td><td class="r num">${x.closed}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Add an area when you log a set.</div>'}</section>`;
+    h+=`<section class="card"><h2>All time</h2><div class="kpis"><div class="kpi"><b class="num">${r.sets}</b><span>Sets</span></div><div class="kpi"><b class="num">${pct(dts)}</b><span>Door to set</span></div><div class="kpi"><b class="num">${pct(r.showRate)}</b><span>Show rate</span></div><div class="kpi"><b class="num">${pct(r.closeOfSat)}</b><span>Shown to close</span></div></div></section>`;
+  }else{
+    const r=closerRates(list);const perSit=r.sits?list.reduce((a,d)=>a+earned(d)+pending(d),0)/r.sits:0;
+    const need=perSit?Math.ceil(left/perSit):NaN;
+    h+=`<section class="card"><h2>Pace to your goal</h2><div class="pace">${left<=0?`You hit your ${money(g)} goal this week.`:`<b class="num">${money(left)}</b> to go this week. At about ${money(perSit)} per sit, that’s roughly <b class="num">${isNaN(need)?'–':need}</b> more sits.`}</div></section>`;
+    const hb=hourBuckets(list,d=>['closed','serviced'].includes(d.status));const mx=Math.max(1,...hb.map(x=>x.n));
+    const best=hb.filter(x=>x.n>=2).reduce((a,x)=>(x.ok/x.n)>(a?a.ok/a.n:-1)?x:a,null);
+    h+=`<section class="card"><h2>Close rate by hour</h2>${hb.length?`<div class="hours">${hb.map(x=>`<div class="hr"><span class="num">${hourLabel(x.h)}</span><div class="track"><div class="fill${best&&x.h===best.h?' top':''}" style="width:${Math.round(x.n/mx*100)}%"></div></div><span class="v num">${x.ok}/${x.n} sold</span></div>`).join('')}</div><p class="muted" style="margin:10px 0 0">Bar length is how many sits you ran at that hour.${best?` You close best around ${hourLabel(best.h)}.`:''}</p>`:'<div class="empty">Log a few sits to see your best hours.</div>'}</section>`;
+    h+=`<section class="card"><h2>All time</h2><div class="kpis"><div class="kpi"><b class="num">${r.sits}</b><span>Sits</span></div><div class="kpi"><b class="num">${r.sold}</b><span>Sales</span></div><div class="kpi"><b class="num">${pct(r.closeRate)}</b><span>Close rate</span></div><div class="kpi"><b class="num">${isNaN(r.avg)?'–':money(r.avg)}</b><span>Avg sale</span></div></div></section>`;
+  }
+  return h+'</div>';
+}
+
+let tierDraft=null;
+function viewSetup(){
+  const p=S.pay,role=S.role;
+  if(!tierDraft||tierDraft.role!==role)tierDraft={role,list:tierList(p,role).map(t=>({from:t.from,rate:t.rate}))};
+  const u=role==='setter'?'$ per show':(p.mode==='pct'?'% of plan':'$ per sale');
+  return `<div class="stack" style="margin-top:0">
+  <section class="card"><h2>How you get paid</h2>
+    ${role==='setter'?`<div class="two"><div class="field"><label for="pSat">Per appointment that shows</label><input id="pSat" inputmode="decimal" value="${esc(p.sat)}"></div>
+    <div class="field"><label for="pClose">Bonus if it closes</label><input id="pClose" inputmode="decimal" value="${esc(p.close)}"></div></div>`:
+    `<div class="field"><label for="pMode">Commission type</label><select id="pMode"><option value="pct"${p.mode==='pct'?' selected':''}>Percent of the plan</option><option value="flat"${p.mode==='flat'?' selected':''}>Flat amount per sale</option></select></div>
+    <div class="two"><div class="field"><label for="pPct">Percent</label><input id="pPct" inputmode="decimal" value="${esc(p.pct)}"></div><div class="field"><label for="pFlat">Flat per sale</label><input id="pFlat" inputmode="decimal" value="${esc(p.flat)}"></div></div>
+    <label class="check"><input type="checkbox" id="pAfter"${p.afterService?' checked':''}><span>I only get paid after the first service is done</span></label>`}
+    <div class="field"><label for="goal">Weekly income goal</label><input id="goal" inputmode="decimal" value="${esc(S.goal)}"></div>
+  </section>
+  <section class="card"><h2>Tiers</h2>
+    <p class="muted" style="margin:0 0 10px">Your rate above is Tier 1. Add each higher tier: the ${role==='setter'?'show':'sale'} number where it starts and what it pays.</p>
+    <div id="tierRows">${tierDraft.list.map((t,i)=>`<div class="tierrow"><div class="field"><label for="tf_${i}">Starts at ${role==='setter'?'show':'sale'} #</label><input id="tf_${i}" data-tier-from="${i}" inputmode="numeric" value="${esc(t.from)}" placeholder="20"></div><div class="field"><label for="tr_${i}">Pays (${u})</label><input id="tr_${i}" data-tier-rate="${i}" inputmode="decimal" value="${esc(t.rate)}" placeholder="${role==='setter'?'50':'12'}"></div><button type="button" class="iconbtn" data-tier-del="${i}" aria-label="Remove tier ${i+2}">&times;</button></div>`).join('')}</div>
+    <div class="btns" style="margin-bottom:12px"><button type="button" class="btn" data-act="tier-add">+ Add a tier</button></div>
+    <label class="check"><input type="checkbox" id="pRetro"${p.retro?' checked':''}><span>When I hit a new tier, every ${role==='setter'?'show':'sale'} this season gets the higher rate (not just the ones after)</span></label>
+    <div class="field"><label for="season">Season started (tiers count from here)</label><input id="season" type="date" value="${esc(S.seasonStart)}"></div>
+  </section>
+  <section class="card"><h2>Pay period</h2>
+    <div class="two"><div class="field"><label for="freq">How often you’re paid</label><select id="freq"><option value="weekly"${p.freq==='weekly'?' selected':''}>Every week</option><option value="biweekly"${p.freq==='biweekly'?' selected':''}>Every two weeks</option></select></div>
+    <div class="field"><label for="anchor">A day a pay period starts</label><input id="anchor" type="date" value="${esc(p.anchor)}"></div></div>
+  </section>
+  <button type="button" class="bigbtn" data-act="savepay">Save settings</button>
+  <section class="card"><h2>Your data</h2>
+    <div class="prose"><p>Everything stays on this phone. Nothing is sent to your company or anyone else. Log customers by initials or street, not full names.${storageOK?'':' <b>This browser is blocking storage, so entries will be lost when you close the page.</b>'}</p><p>Copy a backup now and then and keep it in your Notes app.</p></div>
+    <div class="btns" style="margin-bottom:10px"><button type="button" class="btn" data-act="backup">Copy backup</button><button type="button" class="btn" data-act="example">Load example</button>
+    <button type="button" class="btn warn" data-act="fresh">${confirmFresh?'Tap again to erase everything':'Start fresh'}</button></div>
+    <div class="field"><label for="restore">Restore from a backup</label><textarea id="restore" rows="3" placeholder="Paste a backup here"></textarea></div>
+    <button type="button" class="btn" data-act="restore">Restore</button>
+  </section>
+  ${feedbackHTML()}
+  <section class="card"><h2>What this is for</h2><div class="prose">
+    <p>Your company app tracks doors and leads for your manager. Knock Ledger tracks your money: what you’ve earned, what you’re still owed, your tier, and which hours and areas pay you best.</p>
+    <p>Put it on your home screen: in Safari tap Share, then Add to Home Screen.</p></div></section>
+  </div>`;
+}
+
+function render(){
+  document.querySelectorAll('#roleSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.role===S.role?'true':'false'));
+  document.querySelectorAll('.tabs button').forEach(b=>b.dataset.tab===tab?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));
+  $('#exampleBar').hidden=!S.example;
+  $('#view').innerHTML=tab==='log'?viewLog():tab==='pay'?viewPay():tab==='insights'?viewInsights():viewSetup();
+}
+
+/* ---------- add / edit sheet ---------- */
+function localInput(iso){const d=iso?new Date(iso):new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T'+pad(d.getHours())+':'+pad(d.getMinutes())}
+function openSheet(kind,editId){
+  const d=editId?S.deals.find(x=>x.id===editId):null;
+  const role=d?d.role:(kind==='setter'?'setter':'closer');
+  const showValue=d?(d.role==='closer'):kind==='sale';
+  const areas=[...new Set(S.deals.filter(x=>x.role===role).map(x=>x.area).filter(Boolean))];
+  const title=d?'Edit entry':kind==='setter'?'Appointment set':kind==='sale'?'Sale':'Sit, no sale';
+  let delArmed=false;
+  const sc=$('#scrim');sc.hidden=false;
+  sc.innerHTML=`<form class="sheet" id="addForm" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <h3 id="sheetTitle">${title}</h3>
+    <div class="field"><label for="fWho">Customer (initials or street)</label><input id="fWho" autocomplete="off" placeholder="G., 19th St" value="${d?esc(d.who):''}" required></div>
+    <div class="field"><label for="fArea">Area or neighborhood</label><input id="fArea" list="areaList" autocomplete="off" placeholder="Tech Terrace" value="${d?esc(d.area):''}"><datalist id="areaList">${areas.map(a=>`<option value="${esc(a)}">`).join('')}</datalist></div>
+    ${showValue?`<div class="field"><label for="fVal">Plan value ($ per year)${d?' (leave blank for no sale)':''}</label><input id="fVal" inputmode="decimal" placeholder="600" value="${d&&num(d.value)?esc(d.value):''}"${!d?' required':''}></div>`:''}
+    ${d?`<div class="field"><label for="fStatus">Status</label><select id="fStatus">${STATUS[role].map(([v,l])=>`<option value="${v}"${d.status===v?' selected':''}>${l}</option>`).join('')}</select></div>`:''}
+    <div class="field"><label for="fAt">When</label><input id="fAt" type="datetime-local" value="${localInput(d&&d.at)}"></div>
+    <div class="btns"><button type="submit" class="btn dark" style="flex:1">Save</button><button type="button" class="btn" data-act="close">Cancel</button></div>
+    ${d?`<div class="btns" style="margin-top:12px"><button type="button" class="btn danger" id="delBtn" style="flex:1">Delete this entry</button></div>`:''}
+  </form>`;
+  setTimeout(()=>{const f=$('#fWho');f&&!d&&f.focus()},50);
+  if(d)$('#delBtn').addEventListener('click',()=>{
+    if(!delArmed){delArmed=true;$('#delBtn').textContent='Tap again to delete';return}
+    S.deals=S.deals.filter(x=>x.id!==d.id);save();closeSheet();render();toast('Entry deleted.');
+  });
+  $('#addForm').addEventListener('submit',e=>{
+    e.preventDefault();const who=$('#fWho').value.trim();if(!who){$('#fWho').focus();return}
+    const val=showValue?num($('#fVal').value):0;
+    if(!d&&kind==='sale'&&!(val>0)){$('#fVal').focus();return}
+    const at=$('#fAt').value?new Date($('#fAt').value).toISOString():new Date().toISOString();
+    if(d){
+      if(S.example){toast('Tap Start my own to edit real entries.');return}
+      d.who=who;d.area=$('#fArea').value.trim();d.at=at;if(showValue)d.value=val;d.status=$('#fStatus').value;
+      save();closeSheet();render();toast('Saved.');return;
+    }
+    leaveExample();
+    S.deals.push({id:uid(),role,at,who,area:$('#fArea').value.trim(),status:kind==='setter'?'set':kind==='sale'?'closed':'sat',value:val||0,paid:false,paidAmt:0});
+    save();closeSheet();tab='log';render();toast(kind==='setter'?'Set logged. Update it once you know if they showed.':kind==='sale'?'Sale logged.':'Sit logged.');
+  });
+}
+function closeSheet(){const sc=$('#scrim');sc.hidden=true;sc.innerHTML=''}
+
+function readTierDraft(){
+  if(!tierDraft)return;
+  tierDraft.list.forEach((t,i)=>{const f=document.getElementById('tf_'+i),r=document.getElementById('tr_'+i);if(f)t.from=f.value;if(r)t.rate=r.value});
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.role){S.role=b.dataset.role;tierDraft=null;save();render();return}
+  if(b.dataset.tab){tab=b.dataset.tab;confirmFresh=false;tierDraft=null;render();window.scrollTo(0,0);return}
+  if(b.dataset.add){openSheet(b.dataset.add);return}
+  if(b.dataset.edit){openSheet(null,b.dataset.edit);return}
+  if(b.dataset.filter){payFilter=b.dataset.filter;render();return}
+  if(b.dataset.paymode){payMode=b.dataset.paymode;render();return}
+  if(b.dataset.doors){leaveExample();const k=todayKey();S.doors[k]=Math.max(0,num(S.doors[k])+Number(b.dataset.doors));save();render();return}
+  if(b.dataset.paid){const d=S.deals.find(x=>x.id===b.dataset.paid);if(!d)return;if(S.example){toast('Tap Start my own to track real pay.');return}
+    if(d.paid){d.paid=false;d.paidAmt=0}else{const e2=earned(d);if(e2<=0){toast('Nothing earned on this one yet.');return}d.paid=true;d.paidAmt=e2}save();render();return}
+  if(b.dataset.tierDel!==undefined){readTierDraft();tierDraft.list.splice(Number(b.dataset.tierDel),1);render();return}
+  const act=b.dataset.act;if(!act)return;
+  if(act==='close'){closeSheet();return}
+  if(act==='fresh-now'){leaveExample();save();render();return}
+  if(act==='tier-add'){readTierDraft();const last=tierDraft.list[tierDraft.list.length-1];tierDraft.list.push({from:last?num(last.from)+15:16,rate:''});render();const i=tierDraft.list.length-1;const el=document.getElementById('tf_'+i);el&&el.focus();return}
+  if(act==='savepay'){
+    const v=id=>{const el=document.getElementById(id);return el?num(el.value):0};
+    if(S.role==='setter'){S.pay.sat=v('pSat');S.pay.close=v('pClose')}else{S.pay.mode=$('#pMode').value;S.pay.pct=v('pPct');S.pay.flat=v('pFlat');S.pay.afterService=$('#pAfter').checked}
+    readTierDraft();const clean=tierDraft.list.map(t=>({from:Math.round(num(t.from)),rate:num(t.rate)})).filter(t=>t.from>1&&t.rate>0).sort((a,z)=>a.from-z.from);
+    if(S.role==='setter')S.pay.setterTiers=clean;else S.pay.closerTiers=clean;tierDraft=null;
+    S.pay.retro=$('#pRetro').checked;S.seasonStart=$('#season').value||'';
+    S.pay.freq=$('#freq').value;S.pay.anchor=$('#anchor').value||dkey(weekStart());
+    S.goal=v('goal');save();render();toast('Saved. Your numbers are updated.');return}
+  if(act==='backup'){const txt=JSON.stringify(S);
+    const done=()=>toast('Backup copied. Paste it into a note.');
+    const fail=()=>{const ta=$('#restore');ta.value=txt;ta.focus();ta.select();toast('Copy blocked here. The backup is selected in the box below.')};
+    try{navigator.clipboard.writeText(txt).then(done,fail)}catch(err){fail()}return}
+  if(act==='restore'){try{const o=JSON.parse($('#restore').value);if(!o||!Array.isArray(o.deals))throw 0;S=normalize(o);save();render();toast('Backup restored.')}catch(err){toast('That doesn’t look like a Knock Ledger backup.')}return}
+  if(act==='example'){S=exampleData();save();tab='log';render();toast('Example loaded.');return}
+  if(act==='fresh'){if(!confirmFresh){confirmFresh=true;render();return}confirmFresh=false;const keep={role:S.role,goal:S.goal,pay:S.pay,seasonStart:S.seasonStart};S=normalize(keep);save();tab='log';render();toast('Erased. Starting fresh.');return}
+});
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.matches('select.status')){const d=S.deals.find(x=>x.id===t.dataset.id);if(d){d.status=t.value;save();render()}return}
+  if(t.id==='doorsTyped'){leaveExample();const v=parseInt(t.value,10);S.doors[todayKey()]=isNaN(v)?0:Math.max(0,v);save();render();return}
+  if(t.dataset&&t.dataset.check){if(S.example){toast('Tap Start my own to check real paychecks.');render();return}const k=S.role+'|'+t.dataset.check;if(t.value.trim()==='')delete S.checks[k];else S.checks[k]=num(t.value);save();render();return}
+});
+$('#scrim').addEventListener('click',e=>{if(e.target.id==='scrim')closeSheet()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#scrim').hidden)closeSheet()});
+render();
+})();
+</script>
+</body></html>
