@@ -1,0 +1,337 @@
+<!doctype html><html lang="en"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Juniper Monthly Letter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap">
+<style>
+/* Layout: a warm, letter-like walk-through (owner picks what's on their mind, sizes it with their own numbers) above the full fictional monthly letter. */
+:root{
+  --bg:#EFF3F0;--surface:#FFFFFF;--surface2:#F3F6F4;--ink:#1B2420;--ink2:#4D5A54;--ink3:#6E7A74;--line:#DCE4DF;
+  --sage:#3F7A63;--sageInk:#2F6450;--sageSoft:#E1EEE7;--rose:#A8506A;--roseSoft:#F6E6EB;--gold:#7E6010;--goldSoft:#F5EDD6;
+  --cta:#2A5746;--h1:#CFE3D8;--h2:#A5CBB6;--h3:#6FA88B;--h4:#3F7A63;--h5:#2A5746;--hiInk:#FFFFFF;
+  --font:"Nunito Sans",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark;
+  --bg:#101512;--surface:#18201C;--surface2:#1F2924;--ink:#EEF3F0;--ink2:#B9C6BF;--ink3:#8B988F;--line:#2B3731;
+  --sage:#7CC3A3;--sageInk:#9AD6BA;--sageSoft:#1E3329;--rose:#E58CA6;--roseSoft:#3A2029;--gold:#E3BF5C;--goldSoft:#352C14;
+  --cta:#24493A;--h1:#1F3A2D;--h2:#2A5746;--h3:#3F7A63;--h4:#5FA184;--h5:#8FCBAE;--hiInk:#0B1510;}}
+:root[data-theme="dark"]{color-scheme:dark;
+  --bg:#101512;--surface:#18201C;--surface2:#1F2924;--ink:#EEF3F0;--ink2:#B9C6BF;--ink3:#8B988F;--line:#2B3731;
+  --sage:#7CC3A3;--sageInk:#9AD6BA;--sageSoft:#1E3329;--rose:#E58CA6;--roseSoft:#3A2029;--gold:#E3BF5C;--goldSoft:#352C14;
+  --cta:#24493A;--h1:#1F3A2D;--h2:#2A5746;--h3:#3F7A63;--h4:#5FA184;--h5:#8FCBAE;--hiInk:#0B1510;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:17px;line-height:1.55}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:24px 56px;display:grid;gap:18px}
+.wrap>*{min-width:0}
+.num{font-variant-numeric:tabular-nums}
+.sample{font-size:13px;color:var(--ink2);text-align:center}
+.hello{padding:8px 4px 4px;display:grid;gap:10px}
+.when{font-size:14px;font-weight:700;color:var(--sageInk);letter-spacing:.04em;text-transform:uppercase}
+.hello h1{margin:0;font-size:34px;line-height:1.15;font-weight:800;text-wrap:balance}
+.hello p{margin:0;color:var(--ink2);font-size:18px;max-width:52ch}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:15px;font-weight:700;border-radius:99px;padding:10px 16px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip:hover{border-color:var(--sage)}
+.chip[aria-pressed="true"]{background:var(--sage);border-color:var(--sage);color:var(--hiInk)}
+button:focus-visible,input:focus-visible,a:focus-visible,.cell:focus-visible{outline:2px solid var(--sage);outline-offset:2px}
+.card{background:var(--surface);border-radius:24px;padding:22px}
+.card h2{margin:0 0 4px;font-size:23px;font-weight:800;text-wrap:balance}
+.card .sub{margin:0 0 16px;color:var(--ink2)}
+/* guided */
+.path{display:grid;gap:14px}
+.beat{display:grid;gap:4px}
+.beat .k{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--sageInk)}
+.beat p{margin:0;color:var(--ink2);max-width:58ch}
+.beat .quote{font-size:21px;font-weight:800;color:var(--ink);line-height:1.3;text-wrap:balance}
+.beat ul{margin:2px 0 0;padding-left:20px;color:var(--ink2);display:grid;gap:2px}
+.ask{background:var(--sageSoft);border-radius:14px;padding:10px 14px;font-size:16px;color:var(--ink);margin-top:6px}
+.ask b{display:block;font-size:12px;letter-spacing:.06em;color:var(--sageInk)}
+.jump{font:inherit;font-size:15px;font-weight:700;color:var(--sageInk);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px;justify-self:start}
+.calc{background:var(--surface2);border-radius:18px;padding:16px;display:grid;gap:12px;margin-top:4px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.fields label{display:grid;gap:4px;font-size:14px;color:var(--ink2)}
+.fields input{font:inherit;font-size:18px;font-weight:700;padding:9px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);width:100%;font-variant-numeric:tabular-nums}
+.result{font-size:16px}
+.result .big{display:block;font-size:30px;font-weight:800;color:var(--ink);line-height:1.2;font-variant-numeric:tabular-nums}
+.caveat{font-size:13px;color:var(--ink3)}
+.steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.steps3 div{background:var(--surface2);border-radius:16px;padding:12px;font-size:15px;color:var(--ink2)}
+.steps3 b{display:block;font-size:12px;letter-spacing:.06em;color:var(--sageInk)}
+.trust{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.trust div{background:var(--surface2);border-radius:16px;padding:12px 14px;font-size:15px;color:var(--ink2)}
+.trust b{color:var(--ink)}
+.cta{background:var(--cta);color:#fff;border-radius:24px;padding:22px;display:grid;gap:10px}
+.cta h2{margin:0;font-size:24px;font-weight:800;text-wrap:balance}
+.cta p{margin:0;opacity:.9;max-width:56ch}
+.contact{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.btn{font:inherit;font-size:15px;font-weight:700;border-radius:99px;padding:10px 16px;border:1.5px solid rgba(255,255,255,.5);background:transparent;color:#fff;cursor:pointer;text-decoration:none;display:inline-flex}
+.btn.pri{background:#fff;color:#1E4536;border-color:#fff}
+.phone{font-size:20px;font-weight:800;user-select:all;font-variant-numeric:tabular-nums}
+.toast{font-size:14px;opacity:.9;min-height:20px}
+/* letter */
+.big3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.b{background:var(--surface);border-radius:22px;padding:18px;text-align:center}
+.b .v{font-size:36px;font-weight:800;line-height:1.1}
+.b .l{font-size:15px;color:var(--ink2);margin-top:4px}
+.people{display:grid;gap:10px}
+.person{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start;background:var(--surface2);border-radius:18px;padding:14px}
+.av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:17px}
+.miss .av{background:var(--roseSoft);color:var(--rose)}
+.pack .av{background:var(--goldSoft);color:var(--gold)}
+.cel .av{background:var(--sageSoft);color:var(--sageInk)}
+.nm{font-weight:700}
+.why{font-size:15px;color:var(--ink2)}
+.msg{margin-top:8px;background:var(--surface);border-radius:14px;padding:10px 12px;font-size:15px;border:1px dashed var(--line)}
+.msg small{display:block;font-size:12px;font-weight:700;color:var(--ink3);letter-spacing:.04em;margin-bottom:2px}
+details summary{cursor:pointer;color:var(--sageInk);font-weight:700;font-size:15px;margin-top:12px}
+.more{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.more span{background:var(--surface2);border-radius:99px;padding:6px 12px;font-size:15px}
+.note{font-size:14px;color:var(--ink3);margin:10px 0 0}
+.hl{box-shadow:0 0 0 3px var(--sage)}
+section.card{scroll-margin-top:16px}
+.heatwrap{overflow-x:auto}
+.heat{display:grid;grid-template-columns:52px repeat(6,minmax(44px,1fr));gap:5px;font-size:13px;min-width:340px}
+.heat .hd{color:var(--ink3);font-weight:700;text-align:center}
+.heat .rl{color:var(--ink2);font-weight:700;display:flex;align-items:center}
+.cell{border-radius:10px;min-height:44px;display:grid;place-items:center;font-weight:800;font-size:14px;position:relative}
+.cell.none{border:1.5px dashed var(--line);color:var(--ink3);font-weight:600}
+.cell .wl{position:absolute;top:3px;right:5px;font-size:10px}
+.ins{margin-top:14px;display:grid;gap:8px}
+.ins div{background:var(--surface2);border-radius:14px;padding:10px 14px;font-size:16px}
+.journey{display:grid;gap:12px}
+.jrow{display:grid;grid-template-columns:150px 1fr 56px;gap:10px;align-items:center}
+.jrow .t{font-size:15px;font-weight:700}
+.jrow .t small{display:block;font-weight:600;color:var(--ink3);font-size:13px}
+.jbar{height:30px;background:var(--surface2);border-radius:10px;overflow:hidden}
+.jbar span{display:block;height:100%;background:var(--sage);border-radius:10px}
+.jrow .n{font-weight:800;font-size:20px;text-align:right}
+.money{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:15px;color:var(--ink2)}
+.money b{color:var(--ink)}
+.foot{font-size:12.5px;color:var(--ink3);text-align:center}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--surface);font-size:13px;border-radius:8px;padding:6px 9px;white-space:nowrap;z-index:5;transform:translate(-50%,-120%)}
+@media (max-width:620px){.big3,.steps3,.trust{grid-template-columns:1fr}.hello h1{font-size:27px}.jrow{grid-template-columns:110px 1fr 44px}}
+</style>
+
+<div class="wrap">
+  <div class="sample">Fictional sample. Juniper Reformer Studio is made up, and every name and number is example data, not a customer result.</div>
+
+  <header class="hello">
+    <div class="when">A sample monthly letter · Pilates and yoga studios · Naté Hailu, Lubbock</div>
+    <h1>What's been on your mind about your studio lately?</h1>
+    <p>Pick the one that sounds most like you. You'll see what it looks like in a studio's data, what's usually behind it, and what it may be costing, using your own numbers.</p>
+    <div class="chips" role="group" aria-label="Choose what's on your mind">
+      <button class="chip" id="c-miss" data-p="miss" aria-pressed="true">Regulars drift away</button>
+      <button class="chip" id="c-intro" data-p="intro" aria-pressed="false">Intro clients don't join</button>
+      <button class="chip" id="c-packs" data-p="packs" aria-pressed="false">Packs go unused</button>
+      <button class="chip" id="c-class" data-p="class" aria-pressed="false">Some classes full, others quiet</button>
+      <button class="chip" id="c-nums" data-p="nums" aria-pressed="false">I don't know my numbers</button>
+    </div>
+  </header>
+
+  <section class="card" aria-live="polite"><div class="path" id="path"></div></section>
+
+  <section class="card">
+    <h2>Could you handle this yourself?</h2>
+    <p class="sub">You might. Whether you work with me or not, here's how I'd approach it.</p>
+    <div class="steps3" id="steps"></div>
+    <p class="sub" style="margin:14px 0 0">If your software and team already do this every month, you don't need me, and I'll tell you. If it keeps slipping through the cracks, that's what the monthly letter is for. I check your exports, explain what changed, suggest up to three actions with message ideas, and talk it through with whoever will act. You send the messages yourself.</p>
+  </section>
+
+  <section class="card">
+    <h2>What you can trust about this page</h2>
+    <div class="trust">
+      <div><b>It's a made-up studio.</b> Juniper and every client name are fictional, so you can see the format. No real studio's data.</div>
+      <div><b>No promise of more clients.</b> The letter shows what happened and suggests next steps. It can't prove why someone stopped coming.</div>
+      <div><b>Minimal data.</b> No card numbers, bank details or health notes. Nothing is shared until we agree in writing how files are handled.</div>
+      <div><b>One clear price.</b> $300 a month for one location, no long-term commitment. A qualified studio can try one letter free first.</div>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2>Want to see if this fits your studio?</h2>
+    <p>A 15-minute chat, by phone or in person. I'll ask how you use your reports today, and if there's no real gap, I'll say so. If a partner helps decide, bring them along or send them this page.</p>
+    <div class="contact">
+      <span class="phone">(832) 507-6699</span>
+      <button class="btn pri" id="copyNum" type="button">Copy number</button>
+      <a class="btn" href="tel:+18325076699">Call</a>
+      <a class="btn" href="sms:+18325076699">Text</a>
+      <button class="btn" id="copyLink" type="button">Copy link to share</button>
+    </div>
+    <div style="font-size:15px;user-select:all;opacity:.9">nat3official@icloud.com</div>
+    <div class="toast" id="toast" role="status"></div>
+  </section>
+
+  <div class="sample">Below is the full fictional letter a studio owner would get each month.</div>
+
+  <header class="hello" id="letter">
+    <div class="when">Your September letter · Juniper Reformer Studio · delivered October 15</div>
+    <h2 style="margin:0;font-size:30px;line-height:1.15;font-weight:800;text-wrap:balance">142 people moved with you this month. 17 regulars could use a hello.</h2>
+    <p>Who to reach out to, who to celebrate, and two schedule ideas to test. Everything is as of September 30, so check anything time-sensitive in your own system first.</p>
+  </header>
+
+  <section class="big3" aria-label="September at a glance">
+    <div class="b"><div class="v num">142</div><div class="l">clients took class</div></div>
+    <div class="b"><div class="v num">71%</div><div class="l">average reformer fill, 30 class times</div></div>
+    <div class="b"><div class="v num">7 of 24</div><div class="l">intro clients joined by day 42</div></div>
+  </section>
+
+  <section class="card" id="s-miss">
+    <h2>People we miss</h2>
+    <p class="sub">They came weekly or more and hadn't been in for 3 weeks as of Sep 30. By the time this letter arrives, that's two weeks older, so check who's already back or been contacted. You choose who to message.</p>
+    <div class="people">
+      <div class="person miss"><div class="av">M</div><div><div class="nm">Maya R.</div><div class="why">Twice a week since March · last class Sep 4</div>
+        <div class="msg"><small>SUGGESTED TEXT · CHECK BEFORE SENDING</small>Hi Maya! We've missed you on the reformer. If your schedule has changed, let me know what times work and I'll check what's open. No pressure.</div></div></div>
+      <div class="person miss"><div class="av">J</div><div><div class="nm">Jenna K.</div><div class="why">Weekly since January · last class Sep 6</div>
+        <div class="msg"><small>SUGGESTED TEXT · CHECK BEFORE SENDING</small>Hi Jenna, it's been a few weeks since we saw you. How are things going? Happy to help you find a class that fits this week.</div></div></div>
+      <div class="person miss"><div class="av">C</div><div><div class="nm">Carla M.</div><div class="why">Twice a week all summer · last class Sep 8</div>
+        <div class="msg"><small>SUGGESTED TEXT · CHECK BEFORE SENDING</small>Hi Carla! Hope your fall is off to a good start. If your schedule changed, tell me what times work better and I'll see what I can hold.</div></div></div>
+    </div>
+    <p class="note">The other 14 names are on your private working list. A real letter includes up to five personalized messages plus reusable templates.</p>
+  </section>
+
+  <section class="card" id="s-packs">
+    <h2>Help them finish their packs</h2>
+    <p class="sub">As of Sep 30, 11 clients had packs ending October 20 to 31 with 3 or more classes left: 41 classes already paid for. Those dates fall after this letter arrives, so a reminder can still help. Check the current balance before sending.</p>
+    <div class="people">
+      <div class="person pack"><div class="av">H</div><div><div class="nm">Hannah B.</div><div class="why">4 classes left · pack ends Oct 20</div></div></div>
+      <div class="person pack"><div class="av">R</div><div><div class="nm">Rosa G.</div><div class="why">3 classes left · pack ends Oct 23</div></div></div>
+      <div class="person pack"><div class="av">E</div><div><div class="nm">Emily C.</div><div class="why">5 classes left · pack ends Oct 27</div></div></div>
+    </div>
+    <details><summary>See the other 8</summary><div class="more"><span>Ava S. · 5 left</span><span>Olivia P. · 4</span><span>Zoe K. · 4</span><span>June T. · 4</span><span>Nora J. · 3</span><span>Mia L. · 3</span><span>Ruth M. · 3</span><span>Elle W. · 3</span></div></details>
+  </section>
+
+  <section class="card">
+    <h2>Worth celebrating</h2>
+    <p class="sub">9 clients hit a milestone in September. A shout-out or a handwritten card can be a nice touch, if they're comfortable being recognized.</p>
+    <div class="people">
+      <div class="person cel"><div class="av">S</div><div><div class="nm">Sofia M. took her 100th class</div><div class="why">Her first class was the grand opening, two years ago.</div></div></div>
+      <div class="person cel"><div class="av">K</div><div><div class="nm">Kate R. took her 50th class</div><div class="why">She started with an intro offer in April.</div></div></div>
+    </div>
+    <details><summary>See the other 7</summary><div class="more"><span>Alma D. · 50th</span><span>Bri S. · 50th</span><span>Cleo T. · 25th</span><span>Dee W. · 25th</span><span>Fay H. · 25th</span><span>Gia N. · 25th</span><span>Ivy O. · 25th</span></div></details>
+  </section>
+
+  <section class="card" id="s-class">
+    <h2>How full your classes felt</h2>
+    <p class="sub">Average share of the 10 reformers booked at each class time in September. W means there was usually a waitlist. Tap a cell for detail.</p>
+    <div class="heatwrap"><div class="heat" id="heat" role="img" aria-label="Class fill by day and time. Tuesday and Thursday 5:30pm and Saturday 9:30am were full with waitlists. Weekday noon classes ran 20 to 50 percent full."></div></div>
+    <p class="note">The 71% at the top is the simple average of these 30 class times (2,140 ÷ 30). It isn't overall seat use.</p>
+    <div class="ins">
+      <div><b>Tuesday and Thursday at 5:30pm</b> ran full with about 4 people waiting. <b>Idea:</b> if you have the instructor and room, trial a 6:30pm class those nights, then re-check in 4 weeks.</div>
+      <div><b>Weekday noon</b> classes ran 20 to 50% full. <b>Idea:</b> test a lunch-break express class for 4 weeks. Check instructor commitments and costs first.</div>
+    </div>
+  </section>
+
+  <section class="card" id="s-intro">
+    <h2>From first class to regular</h2>
+    <p class="sub">Everyone who started the intro offer (3 weeks for $59) between Aug 1 and Aug 19: 24 people, each followed for exactly 42 days, which ends by Sep 30. July comparison: the 23 who started Jul 1 to 19, also at day 42.</p>
+    <div class="journey">
+      <div class="jrow"><div class="t">Started intro<small>Aug 1 to 19</small></div><div class="jbar"><span style="width:100%"></span></div><div class="n num">24</div></div>
+      <div class="jrow"><div class="t">Came 3+ times<small>building the habit</small></div><div class="jbar"><span style="width:67%"></span></div><div class="n num">16</div></div>
+      <div class="jrow"><div class="t">Joined by day 42<small>membership or pack</small></div><div class="jbar"><span style="width:29%"></span></div><div class="n num">7</div></div>
+    </div>
+    <div class="ins"><div>That's <b>29%</b>, compared with 22% (5 of 23) for July. All 7 who joined came 3+ times. Groups this small swing by chance, so it isn't a trend yet. The <b>9</b> who came 3+ times but hadn't joined are worth a personal invitation. Check first whether any joined since.</div></div>
+    <p class="note">Not included: August 20 to 31 starters and the 26 September starters. They'll be measured once they reach day 42.</p>
+  </section>
+
+  <section class="card" id="s-nums">
+    <h2>The money, simply</h2>
+    <div class="money num"><span>September <b>$20,396</b></span><span>Up <b>4%</b> from August ($19,612)</span><span>Memberships <b>$10,962</b></span><span>Class packs <b>$7,480</b></span><span>Intro offers <b>$1,534</b> (26 × $59)</span><span>Retail <b>$420</b></span></div>
+    <p class="note">$10,962 + $7,480 + $1,534 + $420 = $20,396 gross revenue, before fees and expenses. Not profit.</p>
+  </section>
+
+  <p class="foot">Fictional sample by Naté Hailu · made-up studio and example data · drafted with AI assistance · arithmetic checked against the figures shown · a monthly letter, not a live alert list</p>
+</div>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+(function(){
+const P={
+ miss:{feel:'"Regulars just fade away, and I don\'t notice until they\'re gone."',
+  now:'Someone who came twice a week skips one class, then three. You mean to reach out, but the week gets busy, and by the time you remember it feels awkward.',
+  data:'In this sample letter, 17 weekly regulars hadn\'t been in for 3+ weeks by the end of September.',jump:'s-miss',
+  want:'Each month you\'d have a short list of who to check on, a warm message ready for each, and you\'d see whether more of them come back.',
+  why:['Nobody is in charge of reaching out','Your booking app shows visits, but not who\'s gone quiet','Life changed: a new job, a move, a new schedule','Reaching out feels awkward without the right words'],
+  ask:'When a regular stops coming today, how do you usually find out?',
+  f:[['n','Regulars who drift off in a typical month (your estimate)',4],['d','What a regular pays you a month ($)',150],['m','Months this has been happening',3]],
+  out:v=>[v.n*v.d,v.n*v.d*v.m],say:(v,r)=>`About <b>${fmt(v.n)}</b> regulars × <b>$${fmt(v.d)}</b> = <span class="big">$${fmt(r[0])} a month</span>in gross revenue tied to regulars drifting off. Over ${fmt(v.m)} months, that's <b>$${fmt(r[1])}</b>.`,
+  steps:[['Notice','who hasn\'t come in for 3 weeks, on the same day each week'],['Reach out','with a short, personal note'],['Track','who comes back, month by month']]},
+ intro:{feel:'"People love the intro offer, but most of them never join."',
+  now:'They book the intro, come a few times, say they loved it, and then the three weeks end and you don\'t hear from them again.',
+  data:'In this sample, 7 of 24 intro clients joined by day 42. 9 more came 3+ times but hadn\'t joined.',jump:'s-intro',
+  want:'You\'d see who came often enough to be ready, invite each of them personally before the intro ends, and know your real conversion rate.',
+  why:['No personal invitation before the intro ends','Nobody checks who came 3+ times','The jump from $59 to full price feels big','Their first class didn\'t fit their schedule'],
+  ask:'What happens today in the last week of someone\'s intro?',
+  f:[['n','Intro clients in a typical month (your estimate)',25],['g','How many more you\'d hope to convert (your estimate)',2],['d','Monthly membership price ($)',150]],
+  out:v=>[v.g*v.d],say:(v,r)=>`If <b>${fmt(v.g)}</b> more of your <b>${fmt(v.n)}</b> intro clients joined each month at <b>$${fmt(v.d)}</b>, that's <span class="big">$${fmt(r[0])} a month</span>in gross revenue for each month's group, by your estimate. It's a what-if, not a forecast.`,
+  steps:[['Watch','who reaches 3 classes during the intro'],['Invite','each of them personally before it ends'],['Measure','conversion at the same point every month']]},
+ packs:{feel:'"Clients buy packs and then don\'t use them."',
+  now:'Packs expire with classes left. Some clients feel bad about it and don\'t buy another, and you only find out when they\'re gone.',
+  data:'In this sample, 11 clients had packs ending late October with 41 paid classes left.',jump:'s-packs',
+  want:'Each month you\'d see whose pack is ending with classes left, early enough to send a friendly nudge so they use what they paid for.',
+  why:['Nobody sees expiry dates coming','Clients forget they have classes left','Their usual class time filled up','No reminder goes out before the pack ends'],
+  ask:'Do you know right now whose packs end this month?',
+  f:[['c','Unused classes expiring in a typical month (your estimate)',40],['p','Price per class in a pack ($)',25]],
+  out:v=>[v.c*v.p],say:(v,r)=>`<b>${fmt(v.c)}</b> classes × <b>$${fmt(v.p)}</b> = <span class="big">$${fmt(r[0])} a month</span>of paid classes going unused, by your estimate. Unused classes can make clients less likely to buy again.`,
+  steps:[['List','packs ending in the next few weeks with classes left'],['Remind','with a friendly note and a class suggestion'],['Check','who renews after using their classes']]},
+ class:{feel:'"Some classes have a waitlist, others are half empty."',
+  now:'Clients get turned away at 5:30, while the noon instructor teaches to a few people. You\'d like to change the schedule, but you\'re not sure it\'s safe.',
+  data:'In this sample, Tue and Thu 5:30pm ran full with waitlists while weekday noon ran 20 to 50% full.',jump:'s-class',
+  want:'You\'d see fill and waitlists for every class time, try one change, and know within a month whether it worked.',
+  why:['The schedule hasn\'t changed while clients\' lives have','One instructor or time draws everyone','Nobody measures fill by class time','Waitlisted clients give up and don\'t come back'],
+  ask:'Which class time would you change if you knew it was safe?',
+  f:[['w','People turned away from full classes in a week (your estimate)',8],['p','Price per class ($)',25],['wk','Weeks per month',4.3]],
+  out:v=>[v.w*v.p*v.wk],say:(v,r)=>`<b>${fmt(v.w)}</b> people a week × <b>$${fmt(v.p)}</b> × ${fmt(v.wk,1)} weeks = <span class="big">$${fmt(r[0])} a month</span>in classes people wanted but couldn't book, by your estimate.`,
+  steps:[['Map','fill and waitlists for every class time'],['Ask','who relies on the quiet times first'],['Test','one change for 4 weeks, then compare']]},
+ nums:{feel:'"Honestly, I don\'t really know my numbers."',
+  now:'Money comes in and classes fill, but nobody has time to pull it together. You run on feel, and you\'re not always sure it\'s right.',
+  data:'This sample letter puts the month on one page, with every total added up so you can check it.',jump:'s-nums',
+  want:'Once a month you\'d see clients, fill, intro conversions and revenue in plain words, with clear next steps.',
+  why:['Reports are scattered across screens','Nobody knows which numbers matter most','Pulling it together takes hours','Months don\'t compare because definitions change'],
+  ask:'If you could know three things about your studio every month, what would they be?',
+  f:[['h','Hours a month you spend on reports and spreadsheets (your estimate)',4],['r','What an hour of your time is worth ($)',40]],
+  out:v=>[v.h*v.r],say:(v,r)=>`<b>${fmt(v.h)}</b> hours × <b>$${fmt(v.r)}</b> = <span class="big">$${fmt(r[0])} a month</span>of your time on numbers, by your estimate.`,
+  steps:[['Pick','the three to five numbers that matter'],['Define','them the same way every month'],['Review','them on a set day, with next steps']]}
+};
+function fmt(x,d){d=d||0;return Number(x).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d})}
+const path=document.getElementById('path'),steps=document.getElementById('steps');let cur='miss';
+function render(k){cur=k;const p=P[k];
+ document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c.dataset.p===k?'true':'false'));
+ const f=p.f.map(([id,lab,val])=>`<label for="f-${k}-${id}">${lab}<input id="f-${k}-${id}" type="number" inputmode="decimal" min="0" step="any" value="${val}"></label>`).join('');
+ path.innerHTML=`
+ <div class="beat"><div class="k">Sound familiar?</div><p class="quote">${p.feel}</p><p>${p.now}</p></div>
+ <div class="beat"><div class="k">What it looks like in a studio's data</div><p>${p.data}</p><button class="jump" type="button">See it in the sample letter</button></div>
+ <div class="beat"><div class="k">What you'd want instead</div><p>${p.want}</p></div>
+ <div class="beat"><div class="k">What's usually behind it</div><p>It looks the same everywhere. The reason is different in every studio:</p><ul>${p.why.map(w=>`<li>${w}</li>`).join('')}</ul><div class="ask"><b>WORTH ASKING YOURSELF</b>${p.ask}</div></div>
+ <div class="beat"><div class="k">What it may be costing you</div><p>Use your own estimates. Nothing here is a promise, and nothing is sent anywhere.</p>
+  <div class="calc"><div class="fields">${f}</div><div class="result" id="res"></div><div class="caveat">Example values are filled in; change them to yours. This is gross revenue based on your estimate, not profit, and no report can promise to change it.</div></div></div>`;
+ steps.innerHTML=p.steps.map(([b,t])=>`<div><b>${b.toUpperCase()}</b>${t}</div>`).join('');
+ path.querySelectorAll('input').forEach(i=>i.addEventListener('input',calc));
+ path.querySelector('.jump').addEventListener('click',()=>jump(p.jump));
+ calc();}
+function calc(){const p=P[cur],v={};p.f.forEach(([id])=>{const n=parseFloat(document.getElementById(`f-${cur}-${id}`).value);v[id]=isFinite(n)&&n>=0?n:0});document.getElementById('res').innerHTML=p.say(v,p.out(v))}
+function jump(id){const el=document.getElementById(id);if(!el)return;document.querySelectorAll('.hl').forEach(x=>x.classList.remove('hl'));el.classList.add('hl');el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'})}
+document.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>render(c.dataset.p)));
+const toast=document.getElementById('toast');
+function copy(text,msg,node){const ok=()=>toast.textContent=msg;try{navigator.clipboard.writeText(text).then(ok,()=>sel(node))}catch(e){sel(node)}}
+function sel(node){if(!node){toast.textContent='Select the text to copy it.';return}const r=document.createRange();r.selectNodeContents(node);const s=getSelection();s.removeAllRanges();s.addRange(r);toast.textContent='Selected. Use copy on your device.'}
+document.getElementById('copyNum').addEventListener('click',()=>copy('(832) 507-6699','Number copied.',document.querySelector('.phone')));
+document.getElementById('copyLink').addEventListener('click',()=>copy(location.href.split('#')[0],'Link copied. Send it to whoever helps you decide.',null));
+render('miss');
+
+const times=['6am','9:30am','Noon','4:30pm','5:30pm','7pm'];
+const days=[['Mon',[70,90,40,60,100,80]],['Tue',[80,70,30,70,'100w',90]],['Wed',[60,60,20,50,90,70]],['Thu',[80,80,30,70,'100w',90]],['Fri',[70,90,50,null,60,null]],['Sat',[null,'100w',90,null,null,null]]];
+const g=document.getElementById('heat'),tip=document.getElementById('tip');
+const step=v=>v>=95?5:v>=80?4:v>=60?3:v>=40?2:1;
+let h='<div></div>'+times.map(t=>`<div class="hd">${t}</div>`).join('');
+days.forEach(([d,vals])=>{h+=`<div class="rl">${d}</div>`;vals.forEach((raw,i)=>{
+ if(raw===null){h+=`<div class="cell none">–</div>`;return}
+ const w=String(raw).endsWith('w'),v=parseInt(raw,10),s=step(v),ink=s>=4?'var(--hiInk)':'var(--ink)';
+ h+=`<div class="cell num" tabindex="0" data-t="${d} ${times[i]} · about ${Math.round(v/10)} of 10 reformers${w?' · usually a waitlist':''}" style="background:var(--h${s});color:${ink}">${v}%${w?'<span class="wl">W</span>':''}</div>`})});
+g.innerHTML=h;
+g.querySelectorAll('.cell[data-t]').forEach(c=>{const on=()=>{const r=c.getBoundingClientRect();tip.textContent=c.dataset.t;tip.hidden=false;tip.style.left=(r.left+r.width/2)+'px';tip.style.top=r.top+'px'};
+ c.addEventListener('pointerenter',on);c.addEventListener('focus',on);c.addEventListener('pointerdown',on);c.addEventListener('pointerleave',()=>tip.hidden=true);c.addEventListener('blur',()=>tip.hidden=true)});
+window.addEventListener('scroll',()=>tip.hidden=true,{passive:true});
+})();
+</script>
+
+</body></html>
