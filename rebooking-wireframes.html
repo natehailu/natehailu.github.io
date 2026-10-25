@@ -251,7 +251,7 @@ footer p { font-size: 0.875rem; color: var(--fg-muted); max-width: 72ch; }
 <div class="wrap">
   <p class="eyebrow">Airline Rebooking Flow Efficiency · Phase 2</p>
   <h1>Rebooking Flow Wireframes</h1>
-  <p class="lede">Three defects observed during a five-hour irregular-operations event at a small-station gate, and the interface changes proposed to remove them. Screens are generic reconstructions of agent tooling, not any carrier's actual software.</p>
+  <p class="lede">Three defects observed during a five-hour irregular-operations event at a small-station gate, and the interface changes proposed to remove them. Screens are generic reconstructions drawn from firsthand use of the tooling, not any carrier's actual software.</p>
 
   <div class="finding">
     <p>The analysis behind this redesign found that recovery capacity collapses across the day. Among disrupted flights, <span class="stat">10.7%</span> of 9am departures leave a passenger with no same-day option on their route. By 8pm that figure is <span class="stat">73.2%</span>, and average remaining options fall from <span class="stat">5.8</span> to <span class="stat">0.36</span>.</p>
@@ -393,10 +393,11 @@ footer p { font-size: 0.875rem; color: var(--fg-muted); max-width: 72ch; }
 
   <section class="callout">
     <div class="callout-head">
-      <span class="sev sev-3">Target 3 · Open</span>
+      <span class="sev sev-2">Target 3 · Tertiary</span>
       <h2>Multi-leg rebook selection</h2>
     </div>
     <p>The multi-leg rebook screen presents a checkbox for each flight segment. One missed or wrong checkbox silently redefines the itinerary, turning a connection city into a final destination. Each mistake cost roughly 15 to 20 minutes to unwind, and the errors compound under volume.</p>
+    <p>The defect is not the checkbox. It is that the screen never states the outcome. The agent selects segments and the system infers a trip, but the inferred trip is never shown back before it is committed.</p>
 
     <div class="pair">
       <div class="frame">
@@ -423,19 +424,38 @@ footer p { font-size: 0.875rem; color: var(--fg-muted); max-width: 72ch; }
       </div>
 
       <div class="frame">
-        <div class="frame-label">Proposed · not yet designed</div>
-        <div class="screen placeholder">
-          <div class="screen-bar"><span>GATE OPS · MULTI-LEG</span><span>—</span></div>
-          <div class="ph-body">
-            <strong>DESIGN DELIBERATELY OPEN</strong>
-            <span>Requires access to the production screen before a replacement pattern is committed.</span>
+        <div class="frame-label">Proposed</div>
+        <div class="screen proposed">
+          <div class="screen-bar"><span>GATE OPS · MULTI-LEG</span><span>17:05</span></div>
+          <div class="screen-body">
+            <dl class="rows">
+              <dt>PAX</dt><dd>HAILU/N</dd>
+              <dt>TICKETED</dt><dd>LBB–IAH–DEN</dd>
+            </dl>
+            <div class="sep"></div>
+            <div class="opts">
+              <div class="opt sel"><span>SEG 1 · LBB–IAH 19:30</span><span>KEEP</span></div>
+              <div class="opt"><span>SEG 2 · IAH–DEN 07:15+1</span><span>DROPPED</span></div>
+            </div>
+            <div class="alert alert-warning">
+              <strong>THIS CHANGES THE DESTINATION</strong>
+              <span>Passenger was ticketed to DEN. As selected, the trip now ends at IAH.</span>
+            </div>
+            <div class="alert alert-good">
+              <strong>RESULTING ITINERARY</strong>
+              <span>HAILU/N departs LBB 19:30, arrives IAH 22:14. Trip ends IAH.</span>
+            </div>
+            <div class="btnrow">
+              <span class="btn btn-primary">CONFIRM THIS ITINERARY</span>
+              <span class="btn">RESTORE SEG 2</span>
+            </div>
           </div>
         </div>
-        <p class="note">The defect is confirmed from observation. The redesign is <b>not drawn</b>, because proposing a replacement for a screen I have not seen in full would be a guess presented as a decision.</p>
+        <p class="note">The segment list still drives the change, but the screen now states the trip it produces, in plain language, <b>before</b> commit. A destination change raises its own notice rather than passing silently.</p>
       </div>
     </div>
 
-    <div class="impact"><p><b>Direction.</b> Replace per-segment checkboxes with a selection pattern that states the resulting itinerary in plain language before confirmation, so a changed destination cannot pass silently. Exact mechanism pending access.</p></div>
+    <div class="impact"><p><b>Impact.</b> The error becomes visible at the moment it is made instead of 15 to 20 minutes later. The fix adds a confirmation state rather than replacing the selection mechanism, so it does not require retraining agents on a new interaction pattern during an irregular-operations event.</p></div>
   </section>
 
   <footer>
